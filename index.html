@@ -2,216 +2,79 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>崇新 & 艺萌 · 我们的宇宙</title>
-  <meta name="theme-color" content="#080b16">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>崇新 & 艺萌 · 像素小屋</title>
+  <meta name="theme-color" content="#1a1426">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="fx-canvas" aria-hidden="true"></canvas>
-  <div id="progress-bar" aria-hidden="true"></div>
-  <div class="noise" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
 
-  <!-- 开场 -->
-  <div id="loader" aria-hidden="true">
-    <div class="loader-orbit">
-      <div class="orbit-ring"></div><div class="orbit-ring second"></div>
-      <div class="loader-core">♥</div>
-      <span class="orbit-dot dot-1"></span><span class="orbit-dot dot-2"></span>
+  <div class="game-shell">
+    <header class="game-header">
+      <div class="game-title">
+        <span class="pixel-heart">♥</span>
+        <div><h1>我们的像素小屋</h1><p>LOVE HOUSE · 2025.07.08</p></div>
+      </div>
+      <div class="game-day">DAY <strong id="day-counter">0000</strong></div>
+    </header>
+
+    <div class="game-meta">
+      <span class="meta-item"><span class="dot green"></span> 小屋运行中</span>
+      <span class="meta-item" id="found-count">✦ 已发现 0 / 12 个彩蛋</span>
     </div>
-    <p class="loader-title">我们的宇宙</p>
-    <p class="loader-sub">Loading our memories…</p>
+
+    <div class="screen-frame">
+      <div class="screen-topbar">
+        <span class="screen-name">客厅 · LIVING ROOM</span>
+        <span class="screen-hint">方向键 / WASD 移动 · 空格互动</span>
+      </div>
+      <div class="game-screen">
+        <canvas id="game" width="384" height="216"></canvas>
+        <div class="zone-toast" id="zone-toast"><span class="toast-key">SPACE</span><span id="toast-text"></span></div>
+        <div class="crt-glow" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="dpad" aria-label="方向键">
+        <button class="dpad-btn up" data-key="ArrowUp" aria-label="上">▲</button>
+        <button class="dpad-btn left" data-key="ArrowLeft" aria-label="左">◀</button>
+        <button class="dpad-btn down" data-key="ArrowDown" aria-label="下">▼</button>
+        <button class="dpad-btn right" data-key="ArrowRight" aria-label="右">▶</button>
+      </div>
+      <div class="action-area">
+        <button class="action-btn" id="interact-btn"><span class="action-icon">✦</span><span>互动<br><small>SPACE</small></span></button>
+        <p class="control-tip">走到发光的物品旁<br>按互动键发现彩蛋</p>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span>✦ 彩蛋清单</span>
+      <div class="legend-items" id="legend-items"></div>
+    </div>
+
+    <footer class="game-footer">
+      <p>CX <span>♥</span> YM · 我们的故事，藏在这个小屋里</p>
+    </footer>
   </div>
 
-  <!-- 浮动装饰 -->
-  <div class="floating-deco" aria-hidden="true">
-    <span class="deco deco-1">✧</span><span class="deco deco-2">✦</span>
-    <span class="deco deco-3">♡</span><span class="deco deco-4">✧</span>
-    <span class="deco deco-5">·</span><span class="deco deco-6">✦</span>
-  </div>
-
-  <header class="topbar">
-    <a href="#home" class="brand"><span class="brand-mark">✦</span> CX <span class="brand-amp">&amp;</span> YM</a>
-    <nav>
-      <a href="#home">序</a><a href="#story">故事</a><a href="#letter">信</a>
-      <a href="#gallery">影像</a><a href="#map">足迹</a><a href="#moments">时刻</a>
-      <a href="#secret">秘密</a><a href="#notes">留言</a>
-    </nav>
-    <button id="theme-toggle" aria-label="切换主题" title="切换主题">☀️</button>
-  </header>
-
-  <main>
-    <!-- ========== HERO ========== -->
-    <section id="home" class="hero">
-      <div class="hero-grid" aria-hidden="true"></div>
-      <div class="hero-glow" aria-hidden="true"></div>
-      <div class="hero-inner">
-        <div class="status-pill reveal"><span class="status-dot"></span> TOGETHER SINCE 2025.07.08</div>
-        <p class="hero-kicker reveal">This is our little universe</p>
-        <h1 class="reveal">
-          <span class="hero-name" id="name-a">吕崇新</span>
-          <span class="hero-heart">♥</span>
-          <span class="hero-name" id="name-b">项艺萌</span>
-        </h1>
-        <p class="hero-sub reveal">有些故事，不需要旁人懂，只要我们知道就好。</p>
-        <div class="typewriter-wrap reveal"><span class="type-caret"></span><span id="typewriter"></span></div>
-
-        <div class="counter-panel reveal">
-          <div class="counter-top"><span>我们已经一起走过</span><span class="counter-live">● LIVE</span></div>
-          <div class="counter">
-            <div class="counter-item"><strong id="days">0</strong><span>天 DAYS</span></div>
-            <div class="counter-sep"></div>
-            <div class="counter-item"><strong id="hours">0</strong><span>时 HRS</span></div>
-            <div class="counter-sep"></div>
-            <div class="counter-item"><strong id="minutes">0</strong><span>分 MIN</span></div>
-            <div class="counter-sep"></div>
-            <div class="counter-item"><strong id="seconds">0</strong><span>秒 SEC</span></div>
-          </div>
-        </div>
-
-        <div class="hero-actions reveal">
-          <button id="love-btn" class="btn btn-primary" data-heart-burst>收下一句情话 <span>↗</span></button>
-          <button id="music-btn" class="btn btn-ghost" data-burst>♫ 播放我们的旋律</button>
-        </div>
-        <p id="love-message" class="love-message" aria-live="polite"></p>
-        <div class="hero-meta reveal"><span>✦ 共 <strong id="love-count">0</strong> 句告白</span><span class="meta-divider"></span><span>♥ 无限期</span></div>
+  <!-- 彩蛋弹窗 -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <span class="modal-badge" id="modal-badge">✦</span>
+        <div><p class="modal-eyebrow" id="modal-eyebrow">SECRET FOUND</p><h2 id="modal-title">彩蛋</h2></div>
+        <button class="modal-close" data-close aria-label="关闭">✕</button>
       </div>
-      <div class="scroll-cue"><span>SCROLL</span><i></i></div>
-    </section>
-
-    <!-- ========== 故事时间轴 ========== -->
-    <section id="story" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">01 / CHAPTERS</span>
-        <h2>我们的故事<span class="title-dot">.</span></h2>
-        <p>从那一天开始，故事有了主角。</p>
-      </div>
-      <div class="timeline" id="timeline"></div>
-    </section>
-
-    <!-- ========== 情书 ========== -->
-    <section id="letter" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">02 / LETTER</span>
-        <h2>写给你的信<span class="title-dot">.</span></h2>
-        <p>点开，是我不太会说出口的话。</p>
-      </div>
-      <div class="letter-stage reveal">
-        <div class="letter-card" id="letter-card">
-          <div class="letter-card-shine"></div>
-          <div class="letter-seal">♥</div>
-          <p class="letter-card-label">A LETTER FOR YOU</p>
-          <h3>致 艺萌</h3>
-          <p class="letter-card-hint">点击展开信件</p>
-        </div>
-        <div class="letter-content" id="letter-content" hidden>
-          <div class="letter-content-inner">
-            <div class="letter-head"><span>DEAR YIMENG,</span><span id="letter-date">2025.07.08</span></div>
-            <div class="letter-text" id="letter-body"></div>
-            <div class="letter-sign">— 永远是你的 崇新</div>
-            <button id="letter-close" class="text-btn" data-burst>收起信件 ↑</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========== 影像 ========== -->
-    <section id="gallery" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">03 / GALLERY</span>
-        <h2>画面存档<span class="title-dot">.</span></h2>
-        <p>每一帧，都是我们存在过的证据。</p>
-      </div>
-      <div class="gallery-toolbar reveal"><span class="gallery-count" id="gallery-count">06 FRAMES</span><span class="gallery-tip">点击放大 · ← → 翻看</span></div>
-      <div class="gallery" id="gallery-grid"></div>
-    </section>
-
-    <!-- ========== 足迹地图 ========== -->
-    <section id="map" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">04 / PLACES</span>
-        <h2>我们去过的地方<span class="title-dot">.</span></h2>
-        <p>地图上的点，是我们一起走过的人生坐标。</p>
-      </div>
-      <div class="places-wrap reveal">
-        <div class="places-line" aria-hidden="true"></div>
-        <div class="places" id="places"></div>
-      </div>
-    </section>
-
-    <!-- ========== 时刻 / 数据 ========== -->
-    <section id="moments" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">05 / MOMENTS</span>
-        <h2>那些数字背后<span class="title-dot">.</span></h2>
-        <p>把爱量化一下，大概是这样。</p>
-      </div>
-      <div class="stats-grid reveal">
-        <div class="stat-card"><span class="stat-icon">♥</span><strong id="stat-days">0</strong><span class="stat-label">在一起的日子</span></div>
-        <div class="stat-card"><span class="stat-icon">☕</span><strong id="stat-chats">∞</strong><span class="stat-label">聊过的天</span></div>
-        <div class="stat-card"><span class="stat-icon">✦</span><strong id="stat-lines">10</strong><span class="stat-label">藏好的情话</span></div>
-        <div class="stat-card"><span class="stat-icon">◌</span><strong id="stat-future">∞</strong><span class="stat-label">还要一起走</span></div>
-      </div>
-      <div class="milestones reveal">
-        <div class="milestone-bar"><div class="milestone-fill" id="milestone-fill"></div></div>
-        <div class="milestone-labels"><span>2025.07.08 · 起点</span><span id="milestone-next">下一个里程碑计算中…</span></div>
-      </div>
-      <div class="badges reveal" id="badges"></div>
-    </section>
-
-    <!-- ========== 秘密 ========== -->
-    <section id="secret" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">06 / SECRET</span>
-        <h2>一个认真的问题<span class="title-dot">.</span></h2>
-      </div>
-      <div class="secret-panel reveal">
-        <div class="secret-orb" aria-hidden="true"></div>
-        <p class="secret-question">艺萌，<br>愿意一直和我一起吗？</p>
-        <p class="secret-sub">这题我认真问，你可以慢慢答。</p>
-        <div class="secret-actions">
-          <button id="yes-btn" class="btn btn-primary" data-heart-burst>当然愿意 ♥</button>
-          <button id="no-btn" class="btn btn-ghost">再想想～</button>
-        </div>
-        <p id="secret-answer" class="secret-answer" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <!-- ========== 留言 ========== -->
-    <section id="notes" class="section">
-      <div class="section-head reveal">
-        <span class="section-index">07 / NOTES</span>
-        <h2>留下点什么<span class="title-dot">.</span></h2>
-        <p>写下来，就留在这台设备的时光里。</p>
-      </div>
-      <div class="note-compose reveal">
-        <div class="note-compose-head"><span class="compose-dot"></span><span>NEW NOTE</span><span id="note-count">0 / 200</span></div>
-        <textarea id="note-input" maxlength="200" placeholder="今天想对 Ta 说点什么…"></textarea>
-        <div class="note-compose-foot"><span class="note-tip">♡ 只有这台设备看得到</span><button id="note-submit" class="btn btn-primary small" data-burst>贴上去 ↗</button></div>
-      </div>
-      <div id="note-list" class="note-list"></div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-line"></div>
-    <p class="footer-brand">CX <span>♥</span> YM</p>
-    <p>Since 2025.07.08 · 未完待续</p>
-    <p class="footer-sub">Made with all my heart, by 崇新</p>
-  </footer>
-
-  <button id="back-to-top" aria-label="回到顶部">↑</button>
-
-  <div id="lightbox" class="lightbox" hidden>
-    <button id="lightbox-close" class="lightbox-btn" aria-label="关闭">✕</button>
-    <button id="lightbox-prev" class="lightbox-btn prev" aria-label="上一张">‹</button>
-    <img id="lightbox-img" src="" alt="照片">
-    <button id="lightbox-next" class="lightbox-btn next" aria-label="下一张">›</button>
-    <p id="lightbox-caption"></p>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot"><button class="pixel-btn" data-close>收好了 ✓</button></div>
+    </div>
   </div>
 
   <script src="config.js"></script>
-  <script src="effects.js"></script>
+  <script src="game.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
