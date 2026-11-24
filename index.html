@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>崇新 & 艺萌 · 我们的小世界</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="floating-hearts" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">💕 崇新 &amp; 艺萌</div>
+    <nav>
+      <a href="#home">首页</a>
+      <a href="#story">故事</a>
+      <a href="#gallery">相册</a>
+      <a href="#notes">留言</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">从 2025 年 7 月 8 日开始</p>
+        <h1><span id="name-a">吕崇新</span> <span class="heart">♥</span> <span id="name-b">项艺萌</span></h1>
+        <p class="typewriter" id="typewriter"></p>
+
+        <div class="counter-card">
+          <p class="counter-label">我们已经在一起</p>
+          <div class="counter">
+            <div class="counter-item"><strong id="days">0</strong><span>天</span></div>
+            <div class="counter-item"><strong id="hours">0</strong><span>小时</span></div>
+            <div class="counter-item"><strong id="minutes">0</strong><span>分</span></div>
+            <div class="counter-item"><strong id="seconds">0</strong><span>秒</span></div>
+          </div>
+        </div>
+
+        <button id="love-btn" class="primary-btn">点我，收下一句情话 💌</button>
+        <p id="love-message" class="love-message" aria-live="polite"></p>
+        <a class="scroll-hint" href="#story">往下看看我们的小故事 ↓</a>
+      </div>
+      <div class="hero-deco" aria-hidden="true">
+        <span class="blob blob-one"></span><span class="blob blob-two"></span>
+        <span class="doodle doodle-one">☁️</span><span class="doodle doodle-two">🌸</span>
+        <span class="doodle doodle-three">✨</span>
+      </div>
+    </section>
+
+    <section id="story" class="section section-cream">
+      <div class="section-head">
+        <p class="eyebrow">OUR STORY</p>
+        <h2>我们的小故事</h2>
+        <p class="section-sub">每一个重要的日子，都想和你一起记住。</p>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section id="gallery" class="section">
+      <div class="section-head">
+        <p class="eyebrow">OUR MOMENTS</p>
+        <h2>甜蜜相册</h2>
+        <p class="section-sub">把照片放进 images 文件夹，就可以替换下面的占位图啦。</p>
+      </div>
+      <div class="gallery" id="gallery-grid"></div>
+    </section>
+
+    <section id="notes" class="section section-cream">
+      <div class="section-head">
+        <p class="eyebrow">LITTLE NOTES</p>
+        <h2>想对你说的话</h2>
+        <p class="section-sub">留言保存在当前浏览器里，刷新也不会消失（换设备看不到哦）。</p>
+      </div>
+      <div class="note-box">
+        <textarea id="note-input" maxlength="200" placeholder="写下今天想对 Ta 说的话……"></textarea>
+        <div class="note-actions">
+          <span id="note-count">0 / 200</span>
+          <button id="note-submit" class="primary-btn small">贴上去 💗</button>
+        </div>
+      </div>
+      <div id="note-list" class="note-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>崇新 ♥ 艺萌 · 从 2025.07.08 开始，未完待续……</p>
+  </footer>
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button id="lightbox-close" class="lightbox-btn" aria-label="关闭">✕</button>
+    <button id="lightbox-prev" class="lightbox-btn prev" aria-label="上一张">‹</button>
+    <img id="lightbox-img" src="" alt="照片">
+    <button id="lightbox-next" class="lightbox-btn next" aria-label="下一张">›</button>
+    <p id="lightbox-caption"></p>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
