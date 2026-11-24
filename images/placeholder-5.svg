@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE0D1"/><stop offset="1" stop-color="#FFB997"/></linearGradient></defs>
-  <rect width="800" height="600" fill="url(#g)"/>
-  <circle cx="120" cy="110" r="60" fill="#fff" opacity="0.35"/>
-  <circle cx="700" cy="480" r="90" fill="#fff" opacity="0.25"/>
-  <text x="400" y="290" font-size="120" text-anchor="middle">🍓</text>
-  <text x="400" y="380" font-size="42" font-family="sans-serif" fill="#7a5b66" text-anchor="middle">第五张照片</text>
-  <text x="400" y="430" font-size="24" font-family="sans-serif" fill="#9a8791" text-anchor="middle">替换成我们的照片吧 ♡</text>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0e1224"/><stop offset="1" stop-color="#080b16"/></linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5c8a"/><stop offset="1" stop-color="#5eead4"/></linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  <circle cx="400" cy="285" r="130" fill="none" stroke="url(#line)" stroke-width="2" opacity="0.9"/>
+  <circle cx="400" cy="285" r="130" fill="url(#line)" opacity="0.18" filter="url(#glow)"/>
+  <path d="M400 355 C 320 295, 330 225, 400 255 C 470 225, 480 295, 400 355 Z" fill="url(#line)"/>
+  <text x="400" y="450" font-family="sans-serif" font-size="34" letter-spacing="12" fill="#ffffff" opacity="0.9" text-anchor="middle">FRAME 05</text>
+  <text x="400" y="490" font-family="sans-serif" font-size="20" letter-spacing="4" fill="#9a9bb5" text-anchor="middle">替换成我们的照片 ♥</text>
 </svg>
