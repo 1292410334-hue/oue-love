@@ -3,10 +3,20 @@ const startDate = new Date(...CONFIG.startDate);
 const daysTogether = Math.max(0, Math.floor((Date.now() - startDate.getTime()) / 86400000));
 
 const zoneNames = {
+  // 客厅
   neon: 'LOVE灯牌', calendar: '墙上日历', clock: '挂钟', window: '窗户', map: '足迹地图',
   photo: '照片墙', bookshelf: '书架', tv: '电视', arcade: '街机', sofa: '情侣沙发',
   diary: '茶几日记', coffee: '两杯咖啡', plant: '盆栽', cat: '小猫', radio: '音响',
-  fridge: '冰箱', door: '门', trivia: '默契问答'
+  trivia: '默契问答',
+  // 卧室
+  bed: '我们的床', pillowtalk: '情侣抱枕', nightstand: '床头柜', wardrobe: '衣柜',
+  bedwindow: '卧室窗户', dreamcatcher: '捕梦网', 'photo-lamp': '照片灯', slippers: '情侣拖鞋',
+  // 厨房
+  stove: '灶台', cabinet: '橱柜', dining: '餐桌', menu: '今日菜单', 'coffee-machine': '咖啡机',
+  recipe: '食谱架', apron: '情侣围裙',
+  // 卫生间
+  mirror: '镜子', sink: '洗手台', bathtub: '浴缸', rubberduck: '小黄鸭', towels: '情侣毛巾',
+  'plant-bath': '绿植', 'notes-bath': '浴室便签'
 };
 
 // ===== 开场 =====
@@ -23,6 +33,15 @@ $('#intro-replay').addEventListener('click', () => {
   $('#intro').classList.remove('hide');
 });
 
+window.addEventListener('room-change', (event) => {
+  const names = { living: '客厅 · LIVING ROOM', bedroom: '卧室 · BEDROOM', kitchen: '厨房 · KITCHEN', bathroom: '卫生间 · BATHROOM' };
+  $('#room-name').textContent = names[event.detail] || '小屋';
+  const toast = $('#zone-toast');
+  $('#toast-text').textContent = `欢迎来到${names[event.detail].split(' · ')[0]} ♡`;
+  toast.classList.add('show');
+  clearTimeout(window.roomToastTimer);
+  window.roomToastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+});
 // ===== 彩蛋进度 =====
 const foundKey = 'pixel-house-found-v2';
 let found = new Set();
@@ -189,6 +208,137 @@ function renderTrivia() {
 
 // ===== 18 个彩蛋 =====
 const handlers = {
+  // ===== 房间门 =====
+  'door-bedroom'() { PIXEL.setRoom('bedroom'); },
+  'door-kitchen'() { PIXEL.setRoom('kitchen'); },
+  'door-bathroom'() { PIXEL.setRoom('bathroom'); },
+  'door-living'() { PIXEL.setRoom('living'); },
+  'door-living-k'() { PIXEL.setRoom('living'); },
+  'door-living-b'() { PIXEL.setRoom('living'); },
+
+  // ===== 卧室彩蛋 =====
+  bed() {
+    openModal({ badge: '☾', title: '我们的床',
+      body: `<p class="quote">一天里最放松的时刻，是和你一起躺下聊天的那些夜晚。</p>
+        <p>聊今天发生的小事，聊以后想去的地方，聊着聊着就睡着了。</p>
+        <p style="color:var(--muted);font-size:0.75rem">被子上有淡淡的洗衣液香味，枕头是我们一起挑的。</p>` });
+  },
+  pillowtalk() {
+    openModal({ badge: '♥', title: '枕边悄悄话',
+      body: `<p class="quote">${escapeHtml(randomLine(CONFIG.loveLines || []))}</p>
+        <p style="color:var(--muted)">抱着这个枕头的时候，就像你在身边一样。</p>` });
+  },
+  nightstand() {
+    openModal({ badge: '◷', title: '床头柜',
+      body: `<p>床头柜上放着一盏小台灯和一个闹钟。</p>
+        <p class="quote">晚安不是结束，是为了明天醒来还能继续和你说早安。</p>
+        <div class="stat-line"><span>今晚的睡前故事</span><strong>由崇新主讲 ♥</strong></div>` });
+  },
+  wardrobe() {
+    openModal({ badge: '◈', title: '衣柜',
+      body: `<p>衣柜里挂着我们的衣服，左边是你的，右边是我的。</p>
+        <p class="quote">最喜欢的事情之一，就是和你一起挑今天穿什么。</p>
+        <p style="color:var(--muted);font-size:0.75rem">有时候还会穿情侣装出门，被别人看到也不害羞。</p>` });
+  },
+  bedwindow() {
+    openModal({ badge: '✧', title: '卧室的星空',
+      body: `<p class="quote">${escapeHtml(randomLine(CONFIG.windowNotes || []))}</p>
+        <p>睡前看一眼窗外，星星都在替我们说晚安。</p>` });
+  },
+  dreamcatcher() {
+    openModal({ badge: '✦', title: '捕梦网',
+      body: `<p>挂在这里的捕梦网，听说能抓住好梦、挡走噩梦。</p>
+        <p class="quote">愿你每晚都有好梦，梦里也有我。</p>` });
+  },
+  'photo-lamp'() {
+    openModal({ badge: '▣', title: '照片灯串',
+      body: `<p>一串小灯里夹着我们的照片，晚上亮起来特别温暖。</p>
+        <div class="photo-strip">${(CONFIG.photos || []).map(photo => `<figure><img src="${photo.src}" alt="${escapeHtml(photo.caption)}"><figcaption>${escapeHtml(photo.caption)}</figcaption></figure>`).join('')}</div>` });
+  },
+  slippers() {
+    openModal({ badge: '♡', title: '情侣拖鞋',
+      body: `<p>门口摆着两双拖鞋，一大一小，刚好是一对。</p>
+        <p class="quote">回家的时候看到它们，就知道这个家里有人在等你。</p>` });
+  },
+
+  // ===== 厨房彩蛋 =====
+  stove() {
+    openModal({ badge: '♨', title: '灶台',
+      body: `<p>厨房的灶台，是我们一起研究新菜的地方。</p>
+        <p class="quote">不管是成功还是失败，和你一起做的饭都特别香。</p>
+        <p style="color:var(--muted);font-size:0.75rem">下次想做什么菜？告诉你一声，我负责洗碗。</p>` });
+  },
+  cabinet() {
+    openModal({ badge: '◈', title: '橱柜',
+      body: `<p>橱柜里有我们的碗和杯子，都是一起挑的。</p>
+        <p style="color:var(--muted)">左边放你爱吃的零食，右边放我爱喝的茶。中间那一格，留给惊喜。</p>` });
+  },
+  dining() {
+    openModal({ badge: '♥', title: '我们的餐桌',
+      body: `<p>一张小餐桌，两把椅子，够我们坐一辈子。</p>
+        <p class="quote">想和你一起吃很多顿饭，把每一天都过得有滋有味。</p>` });
+  },
+  menu() {
+    openModal({ badge: '✎', title: '今日菜单',
+      body: `<p>今天的菜单由你决定——</p>
+        <div class="stat-line"><span>主食</span><strong>你爱吃的</strong></div>
+        <div class="stat-line"><span>配菜</span><strong>我做的</strong></div>
+        <div class="stat-line"><span>甜点</span><strong>一起分享</strong></div>
+        <p style="color:var(--pink-soft);margin-top:10px">想吃什么，点「盆栽」留言告诉我 ♥</p>` });
+  },
+  'coffee-machine'() {
+    openModal({ badge: '☕', title: '咖啡机',
+      body: `<p>每天早上为你煮一杯咖啡，是我最开心的小事之一。</p>
+        <p class="quote">加多少糖、多少奶，我都记得。</p>` });
+  },
+  recipe() {
+    openModal({ badge: '◈', title: '食谱架',
+      body: `<p>食谱架上放着我们收藏的菜谱，还有很多写满笔记的便签。</p>
+        <p class="quote">我们的拿手菜：一起研究出来的「爱的味道」。</p>
+        <p style="color:var(--muted);font-size:0.75rem">以后学会了新菜，就在这里加一笔。</p>` });
+  },
+  apron() {
+    openModal({ badge: '♡', title: '情侣围裙',
+      body: `<p>两条围裙挂在一起，一条写着「主厨」，一条写着「洗碗的」。</p>
+        <p class="quote">厨房是我们的小舞台，柴米油盐也可以很浪漫。</p>` });
+  },
+
+  // ===== 卫生间彩蛋 =====
+  mirror() {
+    openModal({ badge: '✧', title: '镜子',
+      body: `<p class="quote">镜子里的我们，一起变老，也一起变更好。</p>
+        <p style="color:var(--muted)">每天早上对着它整理发型，然后出门奔赴彼此。</p>` });
+  },
+  sink() {
+    openModal({ badge: '◌', title: '洗手台',
+      body: `<p>洗手台上并排放着两个杯子、两支牙刷。</p>
+        <p class="quote">早起一起刷牙的样子，是我最喜欢的日常。</p>` });
+  },
+  bathtub() {
+    openModal({ badge: '♨', title: '浴缸',
+      body: `<p>泡泡满了，热水刚好，音乐也刚好。</p>
+        <p class="quote">和你一起泡澡、聊天、发呆，时间会变得很慢很慢。</p>` });
+  },
+  rubberduck() {
+    openModal({ badge: '🦆', title: '小黄鸭',
+      body: `<p>这是我们浴缸里的「吉祥物」。</p>
+        <p style="color:var(--muted)">它看起来很淡定，好像在说：你俩的故事，我全都见证过。</p>` });
+  },
+  towels() {
+    openModal({ badge: '♥', title: '情侣毛巾',
+      body: `<p>两条毛巾挂在一起，一条粉色，一条薄荷绿。</p>
+        <p class="quote">连毛巾都要成双成对，这就是我们的小心思。</p>` });
+  },
+  'plant-bath'() {
+    openModal({ badge: '✿', title: '浴室里的绿植',
+      body: `<p>小小的绿植在浴室里也活得很好，就像我们的感情。</p>
+        <p style="color:var(--muted)">不需要太多阳光，一点点陪伴就够。</p>` });
+  },
+  'notes-bath'() {
+    openModal({ badge: '✎', title: '浴室便签',
+      body: `<p class="quote">一些只在这里才会看到的小秘密：</p>
+        <p style="margin-top:12px">「今天也想你了。」<br>「记得买草莓牛奶。」<br>「晚安，明天见。」</p>` });
+  },
   neon() {
     openModal({ badge: '♥', title: 'LOVE 灯牌',
       body: `<p class="quote">${CONFIG.nameA} ♥ ${CONFIG.nameB}</p>
@@ -295,74 +445,56 @@ const handlers = {
         <p style="color:var(--muted)">它伸了个懒腰，从猫窝里走出来，走到猫碗边喝了口水——看起来很满意你摸了摸它。</p>` });
   },
   radio() {
-    const customKey = 'pixel-house-custom-songs';
-    let custom = [];
-    try { custom = JSON.parse(localStorage.getItem(customKey) || '[]'); } catch {}
-    const allSongs = [...(CONFIG.playlist || []), ...custom];
-    const currentSong = (allSongs[musicStep % allSongs.length]) || allSongs[0];
-
+    const tracks = [
+      { name: "有点甜 · 治愈版", notes: [523,587,659,784,659,587,523,587,659,659,784,880,784,659,587,523] },
+      { name: "小酒窝 · 温柔版", notes: [440,523,587,659,587,523,440,392,440,523,587,523,440,392,349,392] },
+      { name: "爱很简单 · 慢版", notes: [349,440,523,587,523,440,392,349,392,440,523,659,587,523,440,349] },
+      { name: "星空小夜曲", notes: [523,659,784,1047,784,659,587,698,880,698,587,523,587,659,784,659] }
+    ];
+    const trackIndex = musicStep % tracks.length;
+    const track = tracks[trackIndex];
+    const playing = Boolean(musicTimer);
     openModal({
-      badge: '♫', eyebrow: 'NETEASE CLOUD MUSIC', title: '我们的音乐盒',
+      badge: '♫', eyebrow: 'MUSIC BOX', title: '我们的音乐盒',
       body: `<div class="music-box">
-        <p style="color:var(--muted);font-size:0.78rem">点一首歌，让网易云陪我们一起待在这个小屋里 ♪</p>
-        <div id="music-player"></div>
-        <div class="music-list" id="music-list">
-          ${allSongs.map((song, index) => `<button class="music-item ${index === (musicStep % allSongs.length) ? 'active' : ''}" data-index="${index}"><span class="music-num">${String(index + 1).padStart(2, '0')}</span><span class="music-name">${escapeHtml(song.name)}</span><span class="music-artist">${escapeHtml(song.artist || '')}</span>${song.custom ? '<span class="music-del" data-del="'+(index - (CONFIG.playlist || []).length)+'" title="删除">✕</span>' : ''}</button>`).join('')}
+        <p style="color:var(--muted);font-size:0.78rem">用小屋里的播放器听一段温柔的旋律 ♪</p>
+        <div class="now-playing"><span class="vinyl ${playing ? 'spinning' : ''}">♫</span><div><strong>${track.name}</strong><small>${playing ? '正在播放' : '点击播放'}</small></div></div>
+        <div class="music-list">
+          ${tracks.map((item, index) => `<button class="music-item ${index === trackIndex ? 'active' : ''}" data-track="${index}"><span class="music-num">${String(index+1).padStart(2,'0')}</span><span class="music-name">${item.name}</span></button>`).join('')}
         </div>
-        <div class="music-add">
-          <input id="song-link" type="text" placeholder="粘贴网易云歌曲分享链接，添加我们喜欢的歌…">
-          <button class="pixel-btn" id="song-add">添加 ♫</button>
+        <div class="music-controls">
+          <button class="pixel-btn" id="music-toggle">${playing ? '■ 停止' : '▶ 播放'}</button>
         </div>
-        <p class="music-tip">在网易云 App 里点「分享 → 复制链接」，粘贴到这里就能加歌。</p>
+        <p class="music-tip">这些旋律是用浏览器现场合成的，不需要联网，一定能播出来 ♡</p>
+        <p class="music-tip" style="margin-top:6px">想听网易云里的完整版？<a href="https://music.163.com" target="_blank" rel="noopener" style="color:var(--pink-soft)">去网易云听 →</a></p>
       </div>`
     });
 
-    function loadPlayer(song) {
-      const player = $('#music-player');
-      if (!player || !song) return;
-      player.innerHTML = `<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="110" src="https://music.163.com/outchain/player?type=2&id=${encodeURIComponent(song.id)}&auto=1&height=86"></iframe>`;
+    function stopMusic() {
+      if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
     }
-    loadPlayer(currentSong);
-
-    $('#music-list').addEventListener('click', (event) => {
-      const del = event.target.closest('[data-del]');
-      if (del) {
-        event.stopPropagation();
-        custom.splice(Number(del.dataset.del), 1);
-        try { localStorage.setItem(customKey, JSON.stringify(custom)); } catch {}
-        handlers.radio();
-        return;
-      }
-      const item = event.target.closest('.music-item');
-      if (!item) return;
-      musicStep = Number(item.dataset.index);
-      loadPlayer(allSongs[musicStep]);
-      $('#music-list').querySelectorAll('.music-item').forEach((node, index) => node.classList.toggle('active', index === musicStep));
-      playTone(784);
+    function playMusic() {
+      stopMusic();
+      let index = 0;
+      const playNext = () => {
+        playTone(track.notes[index % track.notes.length], 0.42, 'sine');
+        if (index % 4 === 0) playTone(Math.round(track.notes[index % track.notes.length] / 2), 0.5, 'triangle');
+        index++;
+      };
+      playNext();
+      musicTimer = setInterval(playNext, 480);
+    }
+    $('#music-toggle').addEventListener('click', () => {
+      if (musicTimer) { stopMusic(); $('#music-toggle').textContent = '▶ 播放'; const vinyl = document.querySelector('.vinyl'); if (vinyl) vinyl.classList.remove('spinning'); }
+      else { playMusic(); $('#music-toggle').textContent = '■ 停止'; const vinyl = document.querySelector('.vinyl'); if (vinyl) vinyl.classList.add('spinning'); }
     });
-
-    $('#song-add').addEventListener('click', () => {
-      const input = $('#song-link');
-      const link = input.value.trim();
-      if (!link) { input.focus(); return; }
-      // 从分享链接里解析歌曲 ID
-      let idMatch = link.match(/[?&#/]id=(\d+)/) || link.match(/\b(\d{5,})\b/);
-      // 处理短链接：尝试从 /song/ 路径解析
-      if (!idMatch) idMatch = link.match(/\/song\/(\d+)/);
-      if (!idMatch) {
-        input.value = '';
-        input.placeholder = '没找到歌曲 ID，请粘贴完整的网易云分享链接';
-        return;
-      }
-      const id = idMatch[1];
-      const nameMatch = link.match(/(?:歌名|song|title)[=:：\s]+([^\s&#]+)/i);
-      custom.push({ id, name: nameMatch ? nameMatch[1] : `我的收藏 ${custom.length + 1}`, artist: '网易云', custom: true });
-      try { localStorage.setItem(customKey, JSON.stringify(custom)); } catch {}
-      playTone(880);
+    $('#music-list').addEventListener('click', (event) => {
+      const item = event.target.closest('[data-track]');
+      if (!item) return;
+      musicStep = Number(item.dataset.track);
       handlers.radio();
     });
-  },
-  fridge() {
+  },  fridge() {
     openModal({ badge: '✎', title: '冰箱上的便签',
       body: `<p>冰箱上贴着几张歪歪扭扭的便签，都是生活里的小提醒。</p>
         ${(CONFIG.fridgeNotes || []).map(note => `<div class="story-item"><p>${escapeHtml(note)}</p></div>`).join('')}
