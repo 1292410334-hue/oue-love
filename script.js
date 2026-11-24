@@ -160,6 +160,7 @@ function startMemoryGame() {
           if (matched === 8) {
             status.textContent = `🎉 全部配对！用了 ${moves} 步 · ${escapeHtml(CONFIG.arcadeReward)}`;
             setTimeout(() => playTone(1047), 200);
+            if (window.Quest) setTimeout(() => window.Quest.notify('arcade-win'), 400);
           }
         }, 400);
       } else {
@@ -530,6 +531,7 @@ const handlers = {
 
 function interact(id) {
   markFound(id);
+  if (window.Quest) window.Quest.notify(id);
   if (handlers[id]) handlers[id]();
   else openModal({ title: zoneNames[id] || '彩蛋', body: '<p>这里的故事，以后慢慢补上。</p>' });
 }
