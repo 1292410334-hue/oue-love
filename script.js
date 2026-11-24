@@ -1,5 +1,7 @@
 const $ = (selector) => document.querySelector(selector);
 const startDate = new Date(...CONFIG.startDate);
+const initialDays = Math.max(0, Math.floor((Date.now() - startDate.getTime()) / 86400000));
+let firstCounterRender = true;
 
 function updateCounter() {
   const diff = Math.max(0, Date.now() - startDate.getTime());
@@ -7,13 +9,24 @@ function updateCounter() {
   const hours = Math.floor(diff / 3600000) % 24;
   const minutes = Math.floor(diff / 60000) % 60;
   const seconds = Math.floor(diff / 1000) % 60;
-  $('#days').textContent = days;
-  $('#hours').textContent = String(hours).padStart(2, '0');
+  if (firstCounterRender) {
+    Effects.animateNumber($('#days'), days, 1800);
+    Effects.animateNumber($('#hours'), hours, 1800);
+    firstCounterRender = false;
+  }
   $('#minutes').textContent = String(minutes).padStart(2, '0');
   $('#seconds').textContent = String(seconds).padStart(2, '0');
 }
+function resumeCounter() {
+  const diff = Math.max(0, Date.now() - startDate.getTime());
+  $('#days').textContent = Math.floor(diff / 86400000);
+  $('#hours').textContent = String(Math.floor(diff / 3600000) % 24).padStart(2, '0');
+  $('#minutes').textContent = String(Math.floor(diff / 60000) % 60).padStart(2, '0');
+  $('#seconds').textContent = String(Math.floor(diff / 1000) % 60).padStart(2, '0');
+}
 updateCounter();
-setInterval(updateCounter, 1000);
+setTimeout(resumeCounter, 1900);
+setInterval(resumeCounter, 1000);
 
 $('#name-a').textContent = CONFIG.nameA;
 $('#name-b').textContent = CONFIG.nameB;
@@ -29,7 +42,7 @@ function typeStep() {
     typeTarget.textContent = text.slice(0, ++charIndex);
     if (charIndex === text.length) {
       erasing = true;
-      return setTimeout(typeStep, 2200);
+      return setTimeout(typeStep, 2400);
     }
   } else {
     typeTarget.textContent = text.slice(0, --charIndex);
@@ -42,21 +55,13 @@ function typeStep() {
 }
 if (CONFIG.typewriter.length) typeStep();
 
-function burstHearts(amount = 16) {
-  const layer = $('#floating-hearts');
-  for (let i = 0; i < amount; i++) {
-    const heart = document.createElement('span');
-    heart.className = 'floating-heart';
-    heart.textContent = ['💕', '💗', '💖', '🌸', '✨'][Math.floor(Math.random() * 5)];
-    heart.style.left = `${Math.random() * 100}vw`;
-    heart.style.animationDuration = `${3 + Math.random() * 2.5}s`;
-    heart.style.fontSize = `${1 + Math.random()}rem`;
-    layer.appendChild(heart);
-    setTimeout(() => heart.remove(), 6000);
-  }
+function burstFromElement(element, amount = 70) {
+  const rect = element.getBoundingClientRect();
+  Effects.burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2, amount);
 }
 
-$('#love-btn').addEventListener('click', () => {
+let loveCount = 0;
+$('#love-btn').addEventListener('click', (event) => {
   const lines = CONFIG.loveLines;
   const message = $('#love-message');
   let next;
@@ -65,11 +70,14 @@ $('#love-btn').addEventListener('click', () => {
   message.classList.remove('pop');
   void message.offsetWidth;
   message.classList.add('pop');
-  burstHearts();
+  loveCount++;
+  $('#love-count').textContent = loveCount;
+  burstFromElement(event.currentTarget, 80);
+  playChime();
 });
 
-$('#timeline').innerHTML = CONFIG.timeline.map(item => `
-  <article class="timeline-item">
+$('#timeline').innerHTML = CONFIG.timeline.map((item, index) => `
+  <article class="timeline-item reveal" style="transition-delay:${index * 60}ms">
     <div class="timeline-emoji">${item.emoji}</div>
     <div>
       <p class="timeline-date">${item.date}</p>
@@ -78,9 +86,25 @@ $('#timeline').innerHTML = CONFIG.timeline.map(item => `
     </div>
   </article>`).join('');
 
+const letterBody = $('#letter-body');
+letterBody.textContent = CONFIG.letter || '';
+$('#envelope').addEventListener('click', (event) => {
+  const envelope = $('#envelope');
+  envelope.classList.toggle('open');
+  $('#letter-paper').hidden = !envelope.classList.contains('open');
+  if (envelope.classList.contains('open')) {
+    burstFromElement(event.currentTarget, 55);
+    playChime(523.25);
+  }
+});
+$('#letter-close').addEventListener('click', () => {
+  $('#envelope').classList.remove('open');
+  $('#letter-paper').hidden = true;
+});
+
 const galleryGrid = $('#gallery-grid');
 galleryGrid.innerHTML = CONFIG.photos.map((photo, index) => `
-  <div class="gallery-card" data-index="${index}" role="button" tabindex="0" aria-label="查看 ${photo.caption}">
+  <div class="gallery-card reveal" data-index="${index}" role="button" tabindex="0" aria-label="查看 ${photo.caption}" style="transition-delay:${(index % 3) * 90}ms">
     <img src="${photo.src}" alt="${photo.caption}" loading="lazy">
     <span>${photo.caption}</span>
   </div>`).join('');
@@ -95,15 +119,16 @@ function showPhoto(index) {
   lightboxImg.src = CONFIG.photos[photoIndex].src;
   lightboxCaption.textContent = CONFIG.photos[photoIndex].caption;
 }
+function openPhoto(index) { showPhoto(index); lightbox.hidden = false; }
 
 galleryGrid.addEventListener('click', (event) => {
   const card = event.target.closest('.gallery-card');
-  if (card) { showPhoto(Number(card.dataset.index)); lightbox.hidden = false; }
+  if (card) openPhoto(Number(card.dataset.index));
 });
 galleryGrid.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter') return;
   const card = event.target.closest('.gallery-card');
-  if (card) { showPhoto(Number(card.dataset.index)); lightbox.hidden = false; }
+  if (card) openPhoto(Number(card.dataset.index));
 });
 $('#lightbox-close').addEventListener('click', () => { lightbox.hidden = true; });
 $('#lightbox-prev').addEventListener('click', () => showPhoto(photoIndex - 1));
@@ -116,6 +141,52 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') showPhoto(photoIndex + 1);
 });
 
+const noButton = $('#no-btn');
+const noTexts = CONFIG.secretNo || ['再想想？'];
+let noClickCount = 0;
+
+function moveNoButton() {
+  const x = 20 + Math.random() * Math.max(20, window.innerWidth - 200);
+  const y = 120 + Math.random() * Math.max(20, window.innerHeight - 320);
+  noButton.style.position = 'fixed';
+  noButton.style.left = `${x}px`;
+  noButton.style.top = `${y}px`;
+  noButton.style.zIndex = 70;
+  noButton.textContent = noTexts[noClickCount % noTexts.length];
+  noClickCount++;
+}
+noButton.addEventListener('mouseenter', moveNoButton);
+noButton.addEventListener('click', moveNoButton);
+noButton.addEventListener('touchstart', moveNoButton, { passive: true });
+
+function shootFireworks(element) {
+  const layer = $('#secret-fireworks');
+  const rect = element.getBoundingClientRect();
+  const originX = rect.left + rect.width / 2;
+  const originY = rect.top + rect.height / 2;
+  for (let i = 0; i < 60; i++) {
+    const spark = document.createElement('span');
+    spark.className = 'firework-spark';
+    spark.textContent = ['♥', '✦', '✧', '💕', '✨'][Math.floor(Math.random() * 5)];
+    const angle = (i / 60) * Math.PI * 2;
+    const radius = 80 + Math.random() * 130;
+    spark.style.left = `${originX}px`;
+    spark.style.top = `${originY}px`;
+    spark.style.setProperty('--dx', `${Math.cos(angle) * radius}px`);
+    spark.style.setProperty('--dy', `${Math.sin(angle) * radius}px`);
+    spark.style.animationDelay = `${Math.random() * 0.2}s`;
+    layer.appendChild(spark);
+    setTimeout(() => spark.remove(), 1800);
+  }
+}
+
+$('#yes-btn').addEventListener('click', (event) => {
+  $('#secret-answer').textContent = CONFIG.secretYes;
+  shootFireworks(event.currentTarget);
+  burstFromElement(event.currentTarget, 100);
+  playChime(659.25);
+});
+
 const STORAGE_KEY = 'our-love-notes';
 const noteInput = $('#note-input');
 const noteList = $('#note-list');
@@ -124,12 +195,13 @@ function loadNotes() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
   catch { return []; }
 }
-
 function saveNotes(notes) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
   catch { alert('浏览器存储不可用，留言无法保存。'); }
 }
-
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+}
 function renderNotes() {
   const notes = loadNotes();
   noteList.innerHTML = notes.length ? notes.map((note, index) => `
@@ -139,30 +211,20 @@ function renderNotes() {
       <small>${note.time}</small>
     </div>`).join('') : '<p style="text-align:center;color:var(--muted)">还没有留言，写下第一句吧～</p>';
 }
-
-function escapeHtml(text) {
-  return text.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-}
-
 noteInput.addEventListener('input', () => {
   $('#note-count').textContent = `${noteInput.value.length} / 200`;
 });
-
-$('#note-submit').addEventListener('click', () => {
+$('#note-submit').addEventListener('click', (event) => {
   const text = noteInput.value.trim();
   if (!text) { noteInput.focus(); return; }
   const notes = loadNotes();
-  notes.unshift({
-    text,
-    time: new Date().toLocaleString('zh-CN', { hour12: false })
-  });
+  notes.unshift({ text, time: new Date().toLocaleString('zh-CN', { hour12: false }) });
   saveNotes(notes);
   noteInput.value = '';
   $('#note-count').textContent = '0 / 200';
   renderNotes();
-  burstHearts(10);
+  burstFromElement(event.currentTarget, 45);
 });
-
 noteList.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-index]');
   if (!button) return;
@@ -171,5 +233,46 @@ noteList.addEventListener('click', (event) => {
   saveNotes(notes);
   renderNotes();
 });
-
 renderNotes();
+
+const THEME_KEY = 'our-love-theme';
+const themeToggle = $('#theme-toggle');
+if (localStorage.getItem(THEME_KEY) === 'night') {
+  document.body.classList.add('night');
+  themeToggle.textContent = '☀️';
+}
+themeToggle.addEventListener('click', () => {
+  const night = document.body.classList.toggle('night');
+  themeToggle.textContent = night ? '☀️' : '🌙';
+  localStorage.setItem(THEME_KEY, night ? 'night' : 'day');
+});
+
+$('#back-to-top').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+let audioContext;
+function playChime(frequency = 440) {
+  try {
+    audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, audioContext.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.45);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.46);
+  } catch { /* 音频不可用就静音 */ }
+}
+
+Effects.initParticleBackground();
+Effects.initCursorTrail();
+Effects.initScrollProgress();
+Effects.initReveal();
+
+window.addEventListener('load', () => {
+  setTimeout(() => $('#loader').classList.add('done'), 1800);
+});
+setTimeout(() => $('#loader').classList.add('done'), 4000);
