@@ -175,6 +175,13 @@ body {
 .music-add input:focus { border-color: var(--pink); }
 .music-add .pixel-btn { padding: 9px 16px; font-size: 0.75rem; white-space: nowrap; }
 .music-tip { color: var(--muted); font-size: 0.68rem; margin-top: 10px; }
+.now-playing { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 2px solid var(--pink); background: rgba(255,92,138,0.08); margin-bottom: 16px; }
+.now-playing .vinyl { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 50%; background: repeating-radial-gradient(circle, #2a2a42 0 4px, #1a1a2e 4px 7px); color: var(--pink); font-size: 1.4rem; border: 2px solid var(--gold); flex: none; }
+.now-playing .vinyl.spinning { animation: vinyl-spin 3s linear infinite; }
+@keyframes vinyl-spin { to { transform: rotate(360deg); } }
+.now-playing strong { display: block; font-size: 0.95rem; }
+.now-playing small { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 2px; }
+.music-controls { display: flex; justify-content: center; margin-top: 12px; }
 
 @media (max-width: 600px) {
   .game-shell { padding: 10px 8px 24px; }
