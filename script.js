@@ -295,15 +295,72 @@ const handlers = {
         <p style="color:var(--muted)">它伸了个懒腰，从猫窝里走出来，走到猫碗边喝了口水——看起来很满意你摸了摸它。</p>` });
   },
   radio() {
-    if (musicTimer) {
-      clearInterval(musicTimer); musicTimer = null;
-      openModal({ badge: '♫', title: '音响已关闭', body: '<p>音乐停下了，但心里的旋律还在。</p>' });
-      return;
+    const customKey = 'pixel-house-custom-songs';
+    let custom = [];
+    try { custom = JSON.parse(localStorage.getItem(customKey) || '[]'); } catch {}
+    const allSongs = [...(CONFIG.playlist || []), ...custom];
+    const currentSong = (allSongs[musicStep % allSongs.length]) || allSongs[0];
+
+    openModal({
+      badge: '♫', eyebrow: 'NETEASE CLOUD MUSIC', title: '我们的音乐盒',
+      body: `<div class="music-box">
+        <p style="color:var(--muted);font-size:0.78rem">点一首歌，让网易云陪我们一起待在这个小屋里 ♪</p>
+        <div id="music-player"></div>
+        <div class="music-list" id="music-list">
+          ${allSongs.map((song, index) => `<button class="music-item ${index === (musicStep % allSongs.length) ? 'active' : ''}" data-index="${index}"><span class="music-num">${String(index + 1).padStart(2, '0')}</span><span class="music-name">${escapeHtml(song.name)}</span><span class="music-artist">${escapeHtml(song.artist || '')}</span>${song.custom ? '<span class="music-del" data-del="'+(index - (CONFIG.playlist || []).length)+'" title="删除">✕</span>' : ''}</button>`).join('')}
+        </div>
+        <div class="music-add">
+          <input id="song-link" type="text" placeholder="粘贴网易云歌曲分享链接，添加我们喜欢的歌…">
+          <button class="pixel-btn" id="song-add">添加 ♫</button>
+        </div>
+        <p class="music-tip">在网易云 App 里点「分享 → 复制链接」，粘贴到这里就能加歌。</p>
+      </div>`
+    });
+
+    function loadPlayer(song) {
+      const player = $('#music-player');
+      if (!player || !song) return;
+      player.innerHTML = `<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="110" src="https://music.163.com/outchain/player?type=2&id=${encodeURIComponent(song.id)}&auto=1&height=86"></iframe>`;
     }
-    openModal({ badge: '♫', title: '我们的旋律', body: '<p>8-bit 小旋律正在播放中～ 再点一次音响可以停止。</p>' });
-    const playNote = () => { playTone(melody[musicStep % melody.length], 0.3, 'square'); musicStep++; };
-    playNote();
-    musicTimer = setInterval(playNote, 420);
+    loadPlayer(currentSong);
+
+    $('#music-list').addEventListener('click', (event) => {
+      const del = event.target.closest('[data-del]');
+      if (del) {
+        event.stopPropagation();
+        custom.splice(Number(del.dataset.del), 1);
+        try { localStorage.setItem(customKey, JSON.stringify(custom)); } catch {}
+        handlers.radio();
+        return;
+      }
+      const item = event.target.closest('.music-item');
+      if (!item) return;
+      musicStep = Number(item.dataset.index);
+      loadPlayer(allSongs[musicStep]);
+      $('#music-list').querySelectorAll('.music-item').forEach((node, index) => node.classList.toggle('active', index === musicStep));
+      playTone(784);
+    });
+
+    $('#song-add').addEventListener('click', () => {
+      const input = $('#song-link');
+      const link = input.value.trim();
+      if (!link) { input.focus(); return; }
+      // 从分享链接里解析歌曲 ID
+      let idMatch = link.match(/[?&#/]id=(\d+)/) || link.match(/\b(\d{5,})\b/);
+      // 处理短链接：尝试从 /song/ 路径解析
+      if (!idMatch) idMatch = link.match(/\/song\/(\d+)/);
+      if (!idMatch) {
+        input.value = '';
+        input.placeholder = '没找到歌曲 ID，请粘贴完整的网易云分享链接';
+        return;
+      }
+      const id = idMatch[1];
+      const nameMatch = link.match(/(?:歌名|song|title)[=:：\s]+([^\s&#]+)/i);
+      custom.push({ id, name: nameMatch ? nameMatch[1] : `我的收藏 ${custom.length + 1}`, artist: '网易云', custom: true });
+      try { localStorage.setItem(customKey, JSON.stringify(custom)); } catch {}
+      playTone(880);
+      handlers.radio();
+    });
   },
   fridge() {
     openModal({ badge: '✎', title: '冰箱上的便签',
