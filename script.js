@@ -1,6 +1,22 @@
 const $ = (selector) => document.querySelector(selector);
 const startDate = new Date(...CONFIG.startDate);
-const daysTogether = Math.max(0, Math.floor((Date.now() - startDate.getTime()) / 86400000));
+function computeDays() {
+  return Math.max(0, Math.floor((Date.now() - startDate.getTime()) / 86400000));
+}
+let daysTogether = computeDays();
+function refreshDays() {
+  const latest = computeDays();
+  if (latest !== daysTogether) {
+    daysTogether = latest;
+    window.dispatchEvent(new CustomEvent('days-change', { detail: latest }));
+  }
+  const text = String(daysTogether).padStart(4, '0');
+  const introDay = $('#intro-day');
+  const dayCounter = $('#day-counter');
+  if (introDay) introDay.textContent = text;
+  if (dayCounter) dayCounter.textContent = text;
+}
+setInterval(refreshDays, 30000);
 
 const zoneNames = {
   // 客厅
