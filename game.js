@@ -9,8 +9,8 @@ const PIXEL = (() => {
   let currentRoom = 'living';
 
   function resize() {
-    const availW = Math.min(window.innerWidth - 40, 1080);
-    const availH = Math.min(window.innerHeight - 250, 680);
+    const availW = Math.min(window.innerWidth - 24, 1400);
+    const availH = Math.min(window.innerHeight - 200, 900);
     scale = Math.max(0.4, Math.min(availW / W, availH / H));
     canvas.style.width = Math.round(W * scale) + 'px';
     canvas.style.height = Math.round(H * scale) + 'px';
