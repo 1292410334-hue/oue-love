@@ -4,9 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>崇新 & 艺萌 · 我们的小世界</title>
+  <meta name="theme-color" content="#fff6f8">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="loader" aria-hidden="true">
+    <div class="loader-flower">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <i>♥</i>
+    </div>
+    <p>为 艺萌 准备的小惊喜</p>
+  </div>
+
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <canvas id="burst-canvas" aria-hidden="true"></canvas>
+  <div id="cursor-layer" aria-hidden="true"></div>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <button id="back-to-top" aria-label="回到顶部">↑</button>
+  <button id="theme-toggle" aria-label="切换主题" title="切换主题">🌙</button>
+
   <div id="floating-hearts" aria-hidden="true"></div>
 
   <header class="topbar">
@@ -14,7 +31,9 @@
     <nav>
       <a href="#home">首页</a>
       <a href="#story">故事</a>
+      <a href="#letter">情书</a>
       <a href="#gallery">相册</a>
+      <a href="#secret">彩蛋</a>
       <a href="#notes">留言</a>
     </nav>
   </header>
@@ -23,10 +42,12 @@
     <section id="home" class="hero">
       <div class="hero-inner">
         <p class="eyebrow">从 2025 年 7 月 8 日开始</p>
-        <h1><span id="name-a">吕崇新</span> <span class="heart">♥</span> <span id="name-b">项艺萌</span></h1>
+        <div class="hero-badge">✦ 只属于我们的小世界 ✦</div>
+        <h1><span id="name-a" class="name-gradient">吕崇新</span> <span class="heart">♥</span> <span id="name-b" class="name-gradient">项艺萌</span></h1>
+        <div class="hero-sparkles" aria-hidden="true"><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>
         <p class="typewriter" id="typewriter"></p>
 
-        <div class="counter-card">
+        <div class="counter-card reveal">
           <p class="counter-label">我们已经在一起</p>
           <div class="counter">
             <div class="counter-item"><strong id="days">0</strong><span>天</span></div>
@@ -38,17 +59,18 @@
 
         <button id="love-btn" class="primary-btn">点我，收下一句情话 💌</button>
         <p id="love-message" class="love-message" aria-live="polite"></p>
+        <p class="love-hint">已经收下 <strong id="love-count">0</strong> 句啦 · 每句都是真心话</p>
         <a class="scroll-hint" href="#story">往下看看我们的小故事 ↓</a>
       </div>
       <div class="hero-deco" aria-hidden="true">
         <span class="blob blob-one"></span><span class="blob blob-two"></span>
         <span class="doodle doodle-one">☁️</span><span class="doodle doodle-two">🌸</span>
-        <span class="doodle doodle-three">✨</span>
+        <span class="doodle doodle-three">✨</span><span class="doodle doodle-four">🦋</span>
       </div>
     </section>
 
     <section id="story" class="section section-cream">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="eyebrow">OUR STORY</p>
         <h2>我们的小故事</h2>
         <p class="section-sub">每一个重要的日子，都想和你一起记住。</p>
@@ -56,8 +78,31 @@
       <div class="timeline" id="timeline"></div>
     </section>
 
-    <section id="gallery" class="section">
-      <div class="section-head">
+    <section id="letter" class="section">
+      <div class="section-head reveal">
+        <p class="eyebrow">A LETTER FOR YOU</p>
+        <h2>一封给你的信</h2>
+        <p class="section-sub">有些话，想认认真真写下来。</p>
+      </div>
+      <div class="letter-stage reveal">
+        <button id="envelope" class="envelope" aria-label="点开信封">
+          <span class="envelope-flap"></span>
+          <span class="envelope-heart">♥</span>
+          <span class="envelope-text">点我拆开</span>
+        </button>
+        <div id="letter-paper" class="letter-paper" hidden>
+          <div class="letter-paper-inner">
+            <p class="letter-salutation">艺萌：</p>
+            <p id="letter-body"></p>
+            <p class="letter-sign">永远喜欢你的 崇新 ♥</p>
+            <button id="letter-close" class="letter-close">折回信封 ✉️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="section section-cream">
+      <div class="section-head reveal">
         <p class="eyebrow">OUR MOMENTS</p>
         <h2>甜蜜相册</h2>
         <p class="section-sub">把照片放进 images 文件夹，就可以替换下面的占位图啦。</p>
@@ -65,13 +110,28 @@
       <div class="gallery" id="gallery-grid"></div>
     </section>
 
-    <section id="notes" class="section section-cream">
-      <div class="section-head">
+    <section id="secret" class="section">
+      <div class="secret-card reveal">
+        <div class="secret-glow" aria-hidden="true"></div>
+        <p class="eyebrow">A LITTLE QUESTION</p>
+        <h2>艺萌，愿意一直和我一起吗？</h2>
+        <p class="secret-sub">这个问题我认真问，你也可以认真想。</p>
+        <div class="secret-buttons">
+          <button id="yes-btn" class="primary-btn">当然愿意！💖</button>
+          <button id="no-btn" class="naughty-btn">再想想～</button>
+        </div>
+        <p id="secret-answer" class="secret-answer" aria-live="polite"></p>
+        <div id="secret-fireworks" class="secret-fireworks" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section id="notes" class="section">
+      <div class="section-head reveal">
         <p class="eyebrow">LITTLE NOTES</p>
         <h2>想对你说的话</h2>
         <p class="section-sub">留言保存在当前浏览器里，刷新也不会消失（换设备看不到哦）。</p>
       </div>
-      <div class="note-box">
+      <div class="note-box reveal">
         <textarea id="note-input" maxlength="200" placeholder="写下今天想对 Ta 说的话……"></textarea>
         <div class="note-actions">
           <span id="note-count">0 / 200</span>
@@ -84,6 +144,7 @@
 
   <footer>
     <p>崇新 ♥ 艺萌 · 从 2025.07.08 开始，未完待续……</p>
+    <p class="footer-sub">Made with ♥ by 崇新 · 每天爱你多一点</p>
   </footer>
 
   <div id="lightbox" class="lightbox" hidden>
@@ -95,6 +156,7 @@
   </div>
 
   <script src="config.js"></script>
+  <script src="effects.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
