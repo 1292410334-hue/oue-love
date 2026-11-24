@@ -10,25 +10,59 @@
 <body>
   <div class="scanlines" aria-hidden="true"></div>
 
-  <!-- ===== 开场画面 ===== -->
+  <!-- ===== 开场画面：西式古典标题页 ===== -->
   <div id="intro" class="intro">
-    <div class="intro-stars" aria-hidden="true"></div>
-    <div class="intro-float-hearts" aria-hidden="true">
-      <span style="--x:12%;--d:0s">♥</span><span style="--x:28%;--d:1.4s">♡</span>
-      <span style="--x:52%;--d:0.7s">♥</span><span style="--x:74%;--d:2.1s">♡</span>
-      <span style="--x:88%;--d:1.1s">♥</span>
+    <div class="intro-sky" aria-hidden="true">
+      <div class="intro-stars"></div>
+      <div class="intro-moon"></div>
+      <div class="intro-skyline">
+        <span class="building b1"></span><span class="building b2"></span>
+        <span class="building b3"></span><span class="building b4"></span>
+        <span class="building b5"></span><span class="building b6"></span>
+        <span class="building b7"></span><span class="building b8"></span>
+      </div>
+      <div class="intro-hills"></div>
     </div>
-    <div class="intro-panel">
-      <p class="intro-eyebrow">A LITTLE WORLD FOR TWO</p>
-      <div class="intro-hearts"><span>吕崇新</span><i>♥</i><span>项艺萌</span></div>
-      <h1>我们的像素小屋</h1>
-      <p class="intro-sub">這裡藏著好多好多，只屬於我們的秘密。<br>走進去，慢慢探索吧。</p>
-      <div class="intro-date">SINCE 2025.07.08 · DAY <strong id="intro-day">0000</strong></div>
-      <button id="start-btn" class="start-btn">▶ 开始探索</button>
-      <p class="intro-tip">用方向键 / WASD 走动 · 空格互动 · 手机用屏幕按键</p>
+    <div class="intro-petals" aria-hidden="true">
+      <span style="--x:8%;--d:0s">✦</span><span style="--x:18%;--d:2s">·</span>
+      <span style="--x:32%;--d:1s">✧</span><span style="--x:68%;--d:3s">✦</span>
+      <span style="--x:82%;--d:1.5s">·</span><span style="--x:94%;--d:0.5s">✧</span>
     </div>
-  </div>
 
+    <div class="intro-frame">
+      <span class="frame-corner tl"></span><span class="frame-corner tr"></span>
+      <span class="frame-corner bl"></span><span class="frame-corner br"></span>
+      <div class="intro-inner">
+        <div class="crest">
+          <span class="crest-laurel left">❧</span>
+          <div class="crest-shield"><span class="crest-heart">♥</span><span class="crest-year">2025</span></div>
+          <span class="crest-laurel right">❧</span>
+        </div>
+        <p class="intro-eyebrow">A LITTLE WORLD · MADE FOR TWO</p>
+        <div class="intro-rule"><span>◆</span></div>
+        <h1 class="intro-title">The House<br><em>Of Our Love</em></h1>
+        <p class="intro-title-cn">我 们 的 爱 情 小 屋</p>
+        <div class="intro-names">
+          <span class="intro-name">Lü Chongxin</span>
+          <span class="intro-amp">✦</span>
+          <span class="intro-name">Xiang Yimeng</span>
+        </div>
+        <p class="intro-names-cn">吕崇新 <span>♥</span> 项艺萌</p>
+        <div class="intro-rule small"><span>◆</span></div>
+        <p class="intro-quote">“Every love story is beautiful,<br>but ours is my favorite.”</p>
+        <div class="intro-stats">
+          <div class="intro-stat"><strong id="intro-day">0000</strong><span>DAYS TOGETHER</span></div>
+          <div class="intro-stat-divider"></div>
+          <div class="intro-stat"><strong>2025.07.08</strong><span>SINCE THAT DAY</span></div>
+          <div class="intro-stat-divider"></div>
+          <div class="intro-stat"><strong>04</strong><span>ROOMS TO EXPLORE</span></div>
+        </div>
+        <button id="start-btn" class="start-btn"><span class="btn-ornament">✦</span> ENTER OUR HOUSE <span class="btn-ornament">✦</span></button>
+        <p class="intro-tip">用方向键 / WASD 漫步 · 空格互动 · 手机可用屏幕按键</p>
+      </div>
+    </div>
+    <div class="intro-copyright">EST. 2025 · FOREVER & ALWAYS</div>
+  </div>
   <div class="game-shell" id="game-shell" hidden>
     <header class="game-header">
       <div class="game-title">
