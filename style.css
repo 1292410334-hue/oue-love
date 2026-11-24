@@ -49,10 +49,12 @@ body {
 .intro-frame {
   position: relative; z-index: 3;
   width: min(760px, 94vw); max-height: 94vh; overflow-y: auto;
+  scrollbar-width: none;
   padding: 4px;
   background: linear-gradient(135deg, #d4af6a, #f5e4b0 25%, #8a6a35 50%, #f5e4b0 75%, #d4af6a);
   box-shadow: 0 0 0 1px #5a4520, 0 20px 80px rgba(0,0,0,0.7), 0 0 100px rgba(212,175,106,0.12);
 }
+.intro-frame::-webkit-scrollbar { display: none; }
 .intro-inner {
   position: relative; text-align: center; padding: 38px 40px 30px;
   background: linear-gradient(180deg, rgba(12,22,44,0.97), rgba(18,32,60,0.97));
