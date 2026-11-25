@@ -268,9 +268,8 @@ const handlers = {
         <p class="quote">愿你每晚都有好梦，梦里也有我。</p>` });
   },
   'photo-lamp'() {
-    openModal({ badge: '▣', title: '照片灯串',
-      body: `<p>一串小灯里夹着我们的照片，晚上亮起来特别温暖。</p>
-        <div class="photo-strip">${(CONFIG.photos || []).map(photo => `<figure><img src="${photo.src}" alt="${escapeHtml(photo.caption)}"><figcaption>${escapeHtml(photo.caption)}</figcaption></figure>`).join('')}</div>` });
+    if (window.PhotoGallery) window.PhotoGallery.openGallery();
+    else openModal({ badge: '▣', title: '照片灯串', body: '<p>照片灯串正在准备中…</p>' });
   },
   slippers() {
     openModal({ badge: '♡', title: '情侣拖鞋',
@@ -390,19 +389,16 @@ const handlers = {
         <p style="color:var(--muted);font-size:0.75rem">还有好多地方，等着我们一起去。</p>` });
   },
   photo() {
-    openModal({ badge: '▣', title: '照片墙',
-      body: `<p>墙上的每一张照片，都想好好收藏。</p>
-        <div class="photo-strip">${(CONFIG.photos || []).map(photo => `<figure><img src="${photo.src}" alt="${escapeHtml(photo.caption)}"><figcaption>${escapeHtml(photo.caption)}</figcaption></figure>`).join('')}</div>` });
+    if (window.PhotoGallery) window.PhotoGallery.openGallery();
+    else openModal({ badge: '▣', title: '照片墙', body: '<p>照片墙正在准备中…</p>' });
   },
   bookshelf() {
     openModal({ badge: '✉', title: '书架上的情书',
       body: `<p class="quote">${escapeHtml(CONFIG.letter || '').replace(/\n/g, '<br>')}</p>` });
   },
   tv() {
-    openModal({ badge: '▣', title: '电视里的照片',
-      body: `<p>电视屏幕上循环播放着我们的照片存档。</p>
-        <div class="photo-strip">${(CONFIG.photos || []).map(photo => `<figure><img src="${photo.src}" alt="${escapeHtml(photo.caption)}"><figcaption>${escapeHtml(photo.caption)}</figcaption></figure>`).join('')}</div>
-        <p style="margin-top:14px;color:var(--muted);font-size:0.75rem">把照片放进 images 文件夹，再改 config.js 就能换成我们的回忆。</p>` });
+    if (window.PhotoGallery) window.PhotoGallery.openGallery();
+    else openModal({ badge: '▣', title: '电视里的照片', body: '<p>照片存档正在准备中…</p>' });
   },
   arcade: startMemoryGame,
   trivia: startTriviaGame,
