@@ -22,7 +22,7 @@ const zoneNames = {
   // 客厅
   neon: 'LOVE灯牌', calendar: '墙上日历', clock: '挂钟', window: '窗户', map: '足迹地图',
   photo: '照片墙', bookshelf: '书架', tv: '电视', arcade: '街机', sofa: '情侣沙发',
-  diary: '茶几日记', coffee: '两杯咖啡', plant: '盆栽', cat: '小猫', radio: '音响',
+  diary: '茶几日记', coffee: '两杯咖啡', plant: '盆栽', cat: '小猫', dog: '小狗', radio: '音响',
   trivia: '默契问答',
   // 卧室
   bed: '我们的床', pillowtalk: '情侣抱枕', nightstand: '床头柜', wardrobe: '衣柜',
@@ -456,6 +456,19 @@ const handlers = {
     openModal({ badge: '♡', title: '小猫咪的秘密',
       body: `<p>${escapeHtml(randomLine(CONFIG.catLines || []))}</p>
         <p style="color:var(--muted)">它伸了个懒腰，从猫窝里走出来，走到猫碗边喝了口水——看起来很满意你摸了摸它。</p>` });
+  },
+  dog() {
+    const lines = [
+      '汪汪！它摇着尾巴扑过来，好像在说：你俩要一直在一起哦。',
+      '小狗蹭了蹭你的手，然后把头靠在艺萌腿上，眯起了眼睛。',
+      '它追着你们跑了一圈，累得趴在地上吐舌头，样子特别可爱。',
+      '汪！它好像在催崇新：快给艺萌一个拥抱呀。',
+      '小狗把最爱的小球叼过来，想让你们陪它玩一会儿。'
+    ];
+    openModal({ badge: '🐶', title: '我们的小狗',
+      body: `<p>${lines[Math.floor(Math.random() * lines.length)]}</p>
+        <p style="color:var(--muted)">它是我们家的最小成员，虽然不会说话，但每次回家都摇着尾巴迎接我们。</p>
+        <p class="quote" style="margin-top:10px">有你、有艺萌、还有它，这个家才完整 ♥</p>` });
   },
   radio() {
     const tracks = [
