@@ -191,7 +191,7 @@
         <button class="hud-btn gift-btn" id="hud-gift" title="惊喜盲盒">🎁 <span>盲盒</span></button>
         <button class="hud-btn love-btn" id="hud-love" title="发射爱心">💗 <span>爱心</span></button>
         <button class="hud-btn checkin-btn" id="hud-checkin" title="每日签到">📅 <span>签到</span></button>
-        <button class="hud-btn game-btn" id="hud-game" title="心跳同步小游戏">🎮 <span>心跳</span></button>
+        <button class="hud-btn game-btn" id="hud-game" title="小游戏中心">🎮 <span>游戏</span></button>
       </div>
       <button class="hud-level" id="hud-level" title="我们的恋爱等级"></button>`;
     const shell = document.getElementById('game-shell');
@@ -206,7 +206,10 @@
       showToast('💗 爱心已送达，记得查收哦');
     });
     document.getElementById('hud-checkin').addEventListener('click', dailyCheckin);
-    document.getElementById('hud-game').addEventListener('click', startRhythmGame);
+    document.getElementById('hud-game').addEventListener('click', () => {
+      if (window.GameCenter) window.GameCenter.openMenu();
+      else startRhythmGame();
+    });
     document.getElementById('hud-level').addEventListener('click', () => {
       const lv = getLevel();
       openModal({
@@ -445,7 +448,7 @@
   }
 
   // 保留一个可调用的外部接口
-  window.Quest = { notify, paintHUD, burst, heartRain };
+  window.Quest = { notify, paintHUD, burst, heartRain, startRhythmGame, startMemoryGame: () => { if (typeof interact === 'function') interact('arcade'); }, startTriviaGame: () => { if (typeof interact === 'function') interact('trivia'); } };
 
   // 等待游戏启动后挂载 HUD
   const startBtn = document.getElementById('start-btn');
