@@ -45,6 +45,11 @@ body {
 .intro-hills { position: absolute; bottom: 0; left: 0; right: 0; height: 22%; background: linear-gradient(180deg, #0c1830, #060d1c); clip-path: polygon(0 60%, 12% 42%, 25% 58%, 38% 35%, 52% 55%, 65% 30%, 78% 52%, 90% 38%, 100% 55%, 100% 100%, 0 100%); }
 .intro-petals span { position: absolute; left: var(--x); bottom: -20px; color: rgba(245,217,139,0.55); font-size: 1.1rem; animation: intro-petal 11s var(--d) linear infinite; }
 @keyframes intro-petal { to { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }
+.intro-meteor { position: absolute; width: 140px; height: 2px; background: linear-gradient(90deg, transparent, #fff8dc, transparent); transform: rotate(-32deg); opacity: 0; animation: intro-meteor 9s linear infinite; pointer-events: none; }
+.intro-meteor::after { content: ''; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px #ffe9a8; }
+.intro-meteor.m1 { top: 12%; left: 20%; animation-delay: 2s; }
+.intro-meteor.m2 { top: 26%; left: 55%; animation-delay: 6.5s; animation-duration: 11s; }
+@keyframes intro-meteor { 0%, 92% { opacity: 0; transform: translate(0,0) rotate(-32deg); } 94% { opacity: 1; } 100% { opacity: 0; transform: translate(420px, 260px) rotate(-32deg); } }
 
 .intro-frame {
   position: relative; z-index: 3;
@@ -128,7 +133,14 @@ body {
 .screen-hint { color: var(--muted); }
 .game-screen { position: relative; display: grid; place-items: center; padding: 8px; background: #05040a; min-height: 120px; overflow: hidden; }
 #game { display: block; image-rendering: pixelated; image-rendering: crisp-edges; cursor: crosshair; }
-.crt-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%); box-shadow: inset 0 0 50px rgba(167,139,250,0.12); }
+.ambience-layer {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; z-index: 2;
+  image-rendering: auto;
+  mix-blend-mode: screen;
+}
+.crt-glow { position: absolute; inset: 0; pointer-events: none; z-index: 3; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%), repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px); box-shadow: inset 0 0 60px rgba(167,139,250,0.18), inset 0 0 20px rgba(255,92,138,0.08); }
 .zone-toast { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%) translateY(8px); display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(18,14,28,0.94); border: 2px solid var(--gold); color: var(--text); font-size: 0.72rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; box-shadow: 0 0 16px rgba(255,209,102,0.3); }
 .zone-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast-key { background: var(--gold); color: #120e1c; padding: 2px 6px; font-size: 0.6rem; font-weight: bold; }
@@ -252,6 +264,27 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* ===== 炫光细节：按钮流光 / 边框呼吸 ===== */
+.start-btn, .action-btn, .pixel-btn {
+  position: relative; overflow: hidden;
+}
+.start-btn::after, .action-btn::after, .pixel-btn::after {
+  content: ''; position: absolute; top: 0; left: -60%; width: 35%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg); pointer-events: none;
+  animation: shine-sweep 4s ease-in-out infinite;
+}
+@keyframes shine-sweep { 0%, 60% { left: -60%; } 85%, 100% { left: 130%; } }
+
+.screen-frame { animation: frame-breathe 5s ease-in-out infinite alternate; }
+@keyframes frame-breathe {
+  from { box-shadow: 0 0 0 3px #120e1c, 0 0 24px rgba(167,139,250,0.18), var(--pixel-shadow); }
+  to { box-shadow: 0 0 0 3px #120e1c, 0 0 44px rgba(255,92,138,0.3), var(--pixel-shadow); }
+}
+
+.hud-heart.on { animation: heart-pop .4s ease, heart-glow 1.8s ease-in-out infinite alternate .4s; }
+@keyframes heart-glow { from { text-shadow: 0 0 4px var(--pink); } to { text-shadow: 0 0 14px var(--pink), 0 0 24px var(--pink); } }
 
 /* ===== 恋爱冒险系统 · HUD / 粒子 / 惊喜 ===== */
 #particle-canvas {
