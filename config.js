@@ -82,11 +82,14 @@ const CONFIG = {
   ],
 
   photos: [
-    { src: "images/placeholder-1.svg", caption: "第一帧 · 待替换" },
-    { src: "images/placeholder-2.svg", caption: "第二帧 · 待替换" },
-    { src: "images/placeholder-3.svg", caption: "第三帧 · 待替换" },
-    { src: "images/placeholder-4.svg", caption: "第四帧 · 待替换" },
-    { src: "images/placeholder-5.svg", caption: "第五帧 · 待替换" },
-    { src: "images/placeholder-6.svg", caption: "第六帧 · 待替换" }
+    { src: "images/photo-1.jpg", caption: "海边的晚风 · 记得那一天" },
+    { src: "images/photo-2.jpg", caption: "我们的合影 · 最好的我们" },
+    { src: "images/photo-3.jpg", caption: "靠在一起 · 就很安心" },
+    { src: "images/photo-4.jpg", caption: "镜头里的你 · 偷偷看你" },
+    { src: "images/photo-5.jpg", caption: "又见面啦 · 每次都很开心" },
+    { src: "images/photo-6.jpg", caption: "你的眼睛 · 会说话" },
+    { src: "images/photo-7.jpg", caption: "托着脸的你 · 可爱到犯规" },
+    { src: "images/photo-8.jpg", caption: "那一瞬间 · 想一直记住" },
+    { src: "images/photo-9.jpg", caption: "我们在公园 · 一起发呆"} 
   ]
 };
