@@ -286,6 +286,46 @@ body {
 .hud-heart.on { animation: heart-pop .4s ease, heart-glow 1.8s ease-in-out infinite alternate .4s; }
 @keyframes heart-glow { from { text-shadow: 0 0 4px var(--pink); } to { text-shadow: 0 0 14px var(--pink), 0 0 24px var(--pink); } }
 
+/* ===== 心意角：时间胶囊 / 理由 / 里程碑 / 告白 ===== */
+.extra-btn { border-color: rgba(255,107,157,0.8); color: var(--pink-soft); }
+.capsule-ui textarea, .reasons-add input {
+  width: 100%; padding: 10px 12px; margin: 8px 0;
+  font-family: inherit; font-size: 0.8rem; color: var(--text);
+  background: #120e1c; border: 2px solid var(--border); outline: none; resize: vertical;
+}
+.capsule-ui textarea:focus, .reasons-add input:focus { border-color: var(--pink); }
+.capsule-date-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.capsule-date-row label { font-size: 0.75rem; color: var(--muted); }
+.capsule-date-row input { font-family: inherit; padding: 6px 8px; background: #120e1c; color: var(--text); border: 2px solid var(--border); }
+.capsule-list { display: grid; gap: 8px; max-height: 260px; overflow-y: auto; }
+.capsule-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 2px solid var(--border); background: var(--panel-light); }
+.capsule-item.ready { border-color: var(--gold); background: rgba(255,209,102,0.08); cursor: pointer; }
+.capsule-icon { font-size: 1.3rem; }
+.capsule-item div { flex: 1; min-width: 0; }
+.capsule-item strong { display: block; font-size: 0.75rem; color: var(--gold); }
+.capsule-item p { margin: 4px 0 0; font-size: 0.75rem; color: var(--muted); }
+.capsule-item.ready p { color: var(--text); }
+.capsule-del { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.9rem; }
+.capsule-del:hover { color: var(--pink); }
+
+.reasons-list { display: grid; gap: 6px; max-height: 260px; overflow-y: auto; margin: 12px 0; }
+.reason-item { display: flex; align-items: baseline; gap: 10px; padding: 7px 10px; background: rgba(255,92,138,0.06); border-left: 3px solid var(--pink); }
+.reason-item span { color: var(--gold); font-size: 0.7rem; font-family: Georgia, serif; }
+.reason-item p { margin: 0; font-size: 0.78rem; }
+.reasons-add { display: flex; gap: 8px; }
+.reasons-add input { flex: 1; margin: 0; }
+
+.milestone-ui { text-align: center; padding: 10px 0; }
+.milestone-days { font-family: Georgia, serif; font-size: 4rem; color: var(--gold); line-height: 1.1; text-shadow: 0 0 30px rgba(255,209,102,0.4); margin: 8px 0; }
+.milestone-days small { font-size: 1rem; margin-left: 6px; color: var(--muted); }
+.milestone-ui .progress-bar { margin: 16px 0 10px; }
+
+.proposal-ui { text-align: center; padding: 16px 0; min-height: 180px; }
+.proposal-buttons { display: flex; justify-content: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+.proposal-yes { font-size: 1.1rem; padding: 14px 30px; }
+.proposal-no { background: var(--panel-light); color: var(--muted); border-color: var(--border); box-shadow: 0 4px 0 #1a1426; }
+.proposal-hint { margin-top: 16px; font-size: 0.75rem; color: var(--pink-soft); min-height: 20px; }
+
 /* ===== 恋爱冒险系统 · HUD / 粒子 / 惊喜 ===== */
 #particle-canvas {
   position: fixed; inset: 0; width: 100vw; height: 100vh;
