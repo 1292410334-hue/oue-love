@@ -104,7 +104,11 @@ const PIXEL = (() => {
   }
   defineRooms();
 
-  const zones = () => zoneSets[currentRoom] || [];
+  const zones = () => {
+    const list = (zoneSets[currentRoom] || []).slice();
+    if (currentRoom === 'living') list.push({ id: 'dog', x: dog.x - 14, y: dog.y - 14, w: 28, h: 28, label: '小狗', hint: '摸摸小狗' });
+    return list;
+  };
   function inside(zone, x, y) {
     return x >= zone.x - 12 && x <= zone.x + zone.w + 12 && y >= zone.y - 12 && y <= zone.y + zone.h + 12;
   }
@@ -117,6 +121,7 @@ const PIXEL = (() => {
     const entry = { living: [360, 380], bedroom: [620, 330], kitchen: [620, 350], bathroom: [620, 350] }[room];
     player.x = entry[0]; player.y = entry[1];
     partner.x = entry[0] + 26; partner.y = entry[1] + 10; partner.trail = [];
+    dog.x = entry[0] - 28; dog.y = entry[1] + 12; dog.trail = [];
     playTone(660, 0.08);
     setTimeout(() => playTone(880, 0.12), 90);
     window.dispatchEvent(new CustomEvent('room-change', { detail: room }));
@@ -157,59 +162,159 @@ const PIXEL = (() => {
     rect(x + w - 8, y + h / 2 - 3, 5, 5, C.gold);
   }
 
-  // 像素主角：崇新（黑发大眼镜 + 吉他）、艺萌（长发 + 米色毛衣）
+  // ===== 像素主角（精细版）=====
+  // 崇新：黑发蓬松、黑框大眼镜、条纹衬衫、斜挎木吉他
   function drawGuy(x, y, dir, bounce) {
-    rect(x - 8, y + 13, 16, 3, 'rgba(0,0,0,0.28)');
-    rect(x - 6, y + 6 + bounce, 5, 7, '#3c4258');
-    rect(x + 1, y + 6 - bounce, 5, 7, '#3c4258');
-    rect(x - 7, y - 4, 14, 12, '#f0f0f0');
-    rect(x - 7, y - 4, 14, 2, '#d0d0d0');
-    rect(x - 9, y - 2 + bounce, 2, 8, C.skin);
-    rect(x + 7, y - 2 - bounce, 2, 8, C.skin);
-    rect(x - 6, y - 17, 12, 11, C.skin);
-    rect(x - 8, y - 19, 16, 6, '#24202a');
-    rect(x - 7, y - 22, 14, 4, '#24202a');
-    rect(x - 4, y - 17, 3, 3, '#24202a'); rect(x + 1, y - 17, 3, 3, '#24202a');
-    rect(x - 5, y - 16, 5, 4, C.black); rect(x + 1, y - 16, 5, 4, C.black);
-    rect(x - 1, y - 15, 2, 2, '#24202a');
-    if (dir === 'down') { px(x - 2, y - 12, C.black); px(x + 2, y - 12, C.black); }
+    const back = dir === 'up';
+    const side = dir === 'left' || dir === 'right';
+    // 影子
+    rect(x - 9, y + 15, 18, 3, 'rgba(0,0,0,0.3)');
+    // 腿与鞋
+    rect(x - 6, y + 7 + bounce, 5, 8, '#394154');
+    rect(x + 1, y + 7 - bounce, 5, 8, '#394154');
+    rect(x - 7, y + 14 + bounce, 6, 3, '#1c1c28');
+    rect(x + 1, y + 14 - bounce, 6, 3, '#1c1c28');
+    // 身体：条纹衬衫
+    rect(x - 8, y - 5, 16, 13, '#f2f2f2');
+    for (let stripe = 0; stripe < 3; stripe++) rect(x - 8, y - 3 + stripe * 4, 16, 2, '#c9ced8');
+    rect(x - 8, y - 5, 3, 13, '#e2e5ec');
+    rect(x + 5, y - 5, 3, 13, '#e2e5ec');
+    // 衣领
+    rect(x - 4, y - 6, 4, 3, '#ffffff'); rect(x, y - 6, 4, 3, '#ffffff');
+    rect(x - 1, y - 5, 2, 4, '#5a4638');
+    // 手臂
+    rect(x - 10, y - 3 + bounce, 2, 9, C.skin);
+    rect(x + 8, y - 3 - bounce, 2, 9, C.skin);
+    // 头
+    rect(x - 7, y - 19, 14, 12, C.skin);
+    rect(x - 6, y - 8, 12, 2, '#eab598');
+    // 头发：蓬松分层 + 发丝
+    rect(x - 9, y - 21, 18, 7, '#221f28');
+    rect(x - 8, y - 24, 16, 3, '#221f28');
+    rect(x - 10, y - 19, 2, 5, '#221f28'); rect(x + 8, y - 19, 2, 5, '#221f28');
+    rect(x - 5, y - 25, 4, 2, '#2e2a34'); rect(x + 1, y - 25, 5, 2, '#2e2a34');
+    // 碎刘海
+    rect(x - 6, y - 19, 3, 4, '#221f28'); rect(x - 1, y - 19, 2, 3, '#221f28'); rect(x + 4, y - 19, 3, 4, '#221f28');
+    if (!back) {
+      // 大黑框眼镜 + 镜片高光
+      rect(x - 7, y - 17, 6, 5, '#141218');
+      rect(x + 1, y - 17, 6, 5, '#141218');
+      rect(x - 6, y - 16, 4, 3, '#7d95b8');
+      rect(x + 2, y - 16, 4, 3, '#7d95b8');
+      px(x - 6, y - 16, '#dceaff'); px(x + 2, y - 16, '#dceaff');
+      rect(x - 1, y - 16, 2, 1, '#141218');
+      if (!side) {
+        px(x - 4, y - 15, '#1a1426'); px(x + 4, y - 15, '#1a1426');
+        rect(x - 2, y - 11, 4, 1, '#b46b74');
+      }
+    } else {
+      rect(x - 9, y - 21, 18, 8, '#221f28');
+    }
     // 斜挎吉他
-    rect(x - 10, y - 2, 16, 4, '#8b5a3c');
-    rect(x - 9, y - 5, 10, 10, '#b4784f');
-    circle(x - 4, y, 3, '#5e3a2a');
-    rect(x + 4, y - 8, 3, 16, '#5e3a2a');
+    rect(x - 11, y - 4, 20, 2, '#6b4a34');
+    rect(x - 10, y - 8, 12, 11, '#c98a52');
+    rect(x - 9, y - 7, 10, 9, '#dc9d63');
+    circle(x - 4, y - 3, 3, '#5a3320');
+    rect(x + 3, y - 11, 3, 19, '#7a4a2e');
+    rect(x + 3, y - 11, 3, 3, '#5a3320');
+    for (let s = 0; s < 3; s++) rect(x - 9, y - 6 + s * 2, 10, 1, '#f0d6a8');
+    if (frame % 50 < 8) { px(x - 7, y - 5, C.gold); px(x - 2, y - 4, C.gold); }
   }
 
+  // 艺萌：黑色长卷发、米色毛衣、粉色百褶裙、温柔表情
   function drawGirl(x, y, dir, bounce) {
-    rect(x - 8, y + 13, 16, 3, 'rgba(0,0,0,0.28)');
-    rect(x - 5, y + 6 + bounce, 4, 7, '#f6d3dd');
-    rect(x + 1, y + 6 - bounce, 4, 7, '#f6d3dd');
-    rect(x - 7, y - 4, 14, 12, '#f5e6d0');
-    rect(x - 7, y - 3, 14, 3, '#e8d6bd');
-    rect(x - 7, y + 6, 14, 3, '#e8d6bd');
-    rect(x + 7, y - 2 - bounce, 2, 8, C.skin);
-    rect(x - 8, y - 19, 16, 6, '#2e2430');
-    rect(x - 6, y - 17, 12, 11, C.skin);
-    rect(x - 9, y - 16, 3, 16, '#2e2430');
-    rect(x + 6, y - 16, 3, 16, '#2e2430');
-    rect(x - 5, y - 17, 4, 5, '#2e2430'); rect(x + 2, y - 17, 4, 5, '#2e2430');
-    px(x - 3, y - 12, C.black); px(x + 3, y - 12, C.black);
-    rect(x - 2, y - 8, 4, 1, '#c96b80');
-    if (Math.floor(frame / 40) % 3 === 0) px(x + 9, y - 21, C.pink, 2);
+    const back = dir === 'up';
+    const side = dir === 'left' || dir === 'right';
+    rect(x - 9, y + 15, 18, 3, 'rgba(0,0,0,0.3)');
+    // 腿与鞋
+    rect(x - 5, y + 7 + bounce, 4, 8, C.skin);
+    rect(x + 1, y + 7 - bounce, 4, 8, C.skin);
+    rect(x - 6, y + 14 + bounce, 5, 3, '#3a2a3a');
+    rect(x + 1, y + 14 - bounce, 5, 3, '#3a2a3a');
+    // 粉色百褶裙
+    rect(x - 8, y + 2, 16, 6, '#e8a0b8');
+    for (let f = 0; f < 4; f++) rect(x - 7 + f * 4, y + 3, 1, 5, '#c97a98');
+    // 米色毛衣 + 毛衣纹理
+    rect(x - 8, y - 6, 16, 9, '#f5e6d0');
+    rect(x - 8, y - 6, 16, 2, '#e8d6bd');
+    rect(x - 8, y + 1, 16, 2, '#e8d6bd');
+    for (let t = 0; t < 3; t++) rect(x - 6 + t * 5, y - 3, 1, 3, '#dfccb0');
+    rect(x - 7, y - 1, 14, 1, '#e0cdb2');
+    // 袖子
+    rect(x - 10, y - 5 + bounce, 3, 8, '#f5e6d0');
+    rect(x + 7, y - 5 - bounce, 3, 8, '#f5e6d0');
+    rect(x - 10, y + 2 + bounce, 3, 2, '#e8d6bd');
+    rect(x + 7, y + 2 - bounce, 3, 2, '#e8d6bd');
+    // 长卷发（后层）
+    rect(x - 10, y - 20, 20, 17, '#2e2430');
+    rect(x - 11, y - 12, 3, 14, '#2e2430');
+    rect(x + 8, y - 12, 3, 14, '#2e2430');
+    // 发梢卷度
+    rect(x - 11, y + 2, 4, 3, '#2e2430'); rect(x + 7, y + 2, 4, 3, '#2e2430');
+    rect(x - 12, y + 4, 3, 2, '#362a38'); rect(x + 9, y + 4, 3, 2, '#362a38');
+    // 脸
+    rect(x - 7, y - 19, 14, 12, C.skin);
+    rect(x - 6, y - 8, 12, 2, '#eab598');
+    // 刘海（前层）
+    rect(x - 8, y - 21, 16, 5, '#2e2430');
+    rect(x - 6, y - 19, 4, 3, '#2e2430');
+    rect(x - 1, y - 20, 3, 2, '#2e2430');
+    rect(x + 3, y - 19, 4, 3, '#2e2430');
+    if (!back) {
+      // 大眼睛 + 高光
+      rect(x - 5, y - 16, 4, 5, '#1a1426'); rect(x + 2, y - 16, 4, 5, '#1a1426');
+      px(x - 4, y - 15, '#ffffff'); px(x + 3, y - 15, '#ffffff');
+      px(x - 4, y - 14, '#5a7ab8'); px(x + 3, y - 14, '#5a7ab8');
+      if (!side) {
+        px(x - 2, y - 11, '#c96b80'); px(x + 2, y - 11, '#c96b80');
+        rect(x - 2, y - 9, 4, 1, '#b86074');
+        px(x - 8, y - 10, '#f0a0b0'); px(x + 7, y - 10, '#f0a0b0');
+      }
+    }
+    // 头顶小心心（偶尔冒出）
+    if (Math.floor(frame / 45) % 5 === 0) { px(x + 9, y - 24, C.pink, 2); px(x + 11, y - 24, C.pink, 2); }
+  }
+
+  // 小狗：奶油色，跟着主角跑，摇尾巴、眨眼
+  const dog = { x: 300, y: 352, dir: 'right', moving: false, step: 0, trail: [] };
+  function drawDog(x, y, dir, moving, step) {
+    const bounce = moving ? (Math.floor(step / 3) % 2) : 0;
+    const wag = Math.floor(frame / 5) % 2;
+    const blink = Math.floor(frame / 70) % 9 === 0;
+    rect(x - 10, y + 7, 20, 2, 'rgba(0,0,0,0.25)');
+    // 尾巴（摇动）
+    rect(x + 8, y - 3 - wag, 5, 2, '#d9a066');
+    rect(x + 11, y - 5 - wag, 2, 4, '#d9a066');
+    // 身体
+    rect(x - 8, y - 4, 16, 10, '#f0c88a');
+    rect(x - 8, y + 3, 16, 2, '#dcb076');
+    // 腿
+    rect(x - 6, y + 5 + bounce, 3, 3, '#d9a066');
+    rect(x + 3, y + 5 - bounce, 3, 3, '#d9a066');
+    // 头
+    rect(x - 12, y - 10, 9, 8, '#f6d29a');
+    // 耳朵（垂耳）
+    rect(x - 13, y - 9, 3, 6, '#b8794a');
+    rect(x - 5, y - 9, 3, 6, '#b8794a');
+    // 眼睛、鼻子
+    if (!blink) { px(x - 10, y - 7, '#2a1c1c'); px(x - 7, y - 7, '#2a1c1c'); }
+    else { rect(x - 10, y - 7, 2, 1, '#2a1c1c'); rect(x - 7, y - 7, 2, 1, '#2a1c1c'); }
+    px(x - 9, y - 4, '#2a1c1c', 2);
+    // 项圈 + 爱心吊牌
+    rect(x - 11, y - 2, 7, 2, C.pink);
+    px(x - 8, y, C.gold, 2);
   }
 
   function drawPlayers() {
     const guyBounce = player.moving ? (Math.floor(player.step / 4) % 2) : 0;
     const girlBounce = partner.moving ? (Math.floor(partner.step / 4) % 2) : 0;
-    const guyFirst = player.y <= partner.y;
-    const drawOne = (who, isGuy) => {
-      const x = Math.round(who.x), y = Math.round(who.y);
-      const bounce = isGuy ? guyBounce : girlBounce;
-      if (isGuy) drawGuy(x, y, who.dir, bounce);
-      else drawGirl(x, y, who.dir, bounce);
-    };
-    if (guyFirst) { drawOne(partner, false); drawOne(player, true); }
-    else { drawOne(player, true); drawOne(partner, false); }
+    const actors = [
+      { y: player.y, fn: () => drawGuy(Math.round(player.x), Math.round(player.y), player.dir, guyBounce) },
+      { y: partner.y, fn: () => drawGirl(Math.round(partner.x), Math.round(partner.y), partner.dir, girlBounce) },
+      { y: dog.y, fn: () => drawDog(Math.round(dog.x), Math.round(dog.y), dog.dir, dog.moving, dog.step) }
+    ];
+    actors.sort((a, b) => a.y - b.y);
+    actors.forEach(a => a.fn());
   }
 
   function drawHighlight(zone) {
@@ -605,6 +710,22 @@ const PIXEL = (() => {
         partner.moving = true; partner.step++;
         if (pdist < 8 && partner.trail.length) partner.trail.shift();
       } else partner.moving = false;
+      // 小狗跟着艺萌跑，落后一点
+      dog.trail.push([partner.x, partner.y]);
+      if (dog.trail.length > 30) dog.trail.shift();
+      const dtarget = dog.trail.length ? dog.trail[0] : [partner.x - 20, partner.y + 10];
+      const ddx = dtarget[0] - dog.x, ddy = dtarget[1] - dog.y;
+      const ddist = Math.hypot(ddx, ddy);
+      if (ddist > 4) {
+        const dspeed = Math.min(2.2, ddist);
+        const nx3 = dog.x + ddx / ddist * dspeed;
+        const ny3 = dog.y + ddy / ddist * dspeed;
+        if (!isSolid(nx3, dog.y)) dog.x = nx3;
+        if (!isSolid(dog.x, ny3)) dog.y = ny3;
+        dog.dir = ddx < 0 ? 'left' : 'right';
+        dog.moving = true; dog.step++;
+        if (ddist < 10 && dog.trail.length) dog.trail.shift();
+      } else dog.moving = false;
     } else player.moving = false;
   }
 
