@@ -40,6 +40,7 @@ const PIXEL = (() => {
 
   let frame = 0;
   let player = { x: 360, y: 340, dir: 'down', moving: false, step: 0 };
+  const partner = { x: 384, y: 352, dir: 'down', moving: false, step: 0, trail: [] };
   const keys = {};
   const roomDoors = {};
   const zoneSets = {};
@@ -115,6 +116,7 @@ const PIXEL = (() => {
     // 根据房间设置入场位置（在门口附近）
     const entry = { living: [360, 380], bedroom: [620, 330], kitchen: [620, 350], bathroom: [620, 350] }[room];
     player.x = entry[0]; player.y = entry[1];
+    partner.x = entry[0] + 26; partner.y = entry[1] + 10; partner.trail = [];
     playTone(660, 0.08);
     setTimeout(() => playTone(880, 0.12), 90);
     window.dispatchEvent(new CustomEvent('room-change', { detail: room }));
@@ -155,24 +157,59 @@ const PIXEL = (() => {
     rect(x + w - 8, y + h / 2 - 3, 5, 5, C.gold);
   }
 
-  function drawPlayer() {
-    const pxX = Math.round(player.x), pxY = Math.round(player.y);
-    const bounce = player.moving ? (Math.floor(player.step / 4) % 2) : 0;
-    rect(pxX - 7, pxY + 12, 14, 3, 'rgba(0,0,0,0.3)');
-    rect(pxX - 6, pxY + 5 + bounce, 5, 8, C.pants);
-    rect(pxX + 1, pxY + 5 - bounce, 5, 8, C.pants);
-    rect(pxX - 7, pxY - 5, 14, 13, C.shirt);
-    rect(pxX - 9, pxY - 3 + bounce, 2, 8, C.skin);
-    rect(pxX + 7, pxY - 3 - bounce, 2, 8, C.skin);
-    rect(pxX - 6, pxY - 16, 12, 11, C.skin);
-    rect(pxX - 7, pxY - 18, 14, 5, C.hair);
-    rect(pxX - 7, pxY - 15, 2, 6, C.hair);
-    if (player.dir !== 'up') {
-      if (player.dir === 'left') px(pxX - 4, pxY - 12, C.black);
-      else if (player.dir === 'right') px(pxX + 3, pxY - 12, C.black);
-      else { px(pxX - 3, pxY - 12, C.black); px(pxX + 3, pxY - 12, C.black); }
-    }
-    if (Math.floor(frame / 30) % 4 === 0) px(pxX + 8, pxY - 22, C.pink);
+  // 像素主角：崇新（黑发大眼镜 + 吉他）、艺萌（长发 + 米色毛衣）
+  function drawGuy(x, y, dir, bounce) {
+    rect(x - 8, y + 13, 16, 3, 'rgba(0,0,0,0.28)');
+    rect(x - 6, y + 6 + bounce, 5, 7, '#3c4258');
+    rect(x + 1, y + 6 - bounce, 5, 7, '#3c4258');
+    rect(x - 7, y - 4, 14, 12, '#f0f0f0');
+    rect(x - 7, y - 4, 14, 2, '#d0d0d0');
+    rect(x - 9, y - 2 + bounce, 2, 8, C.skin);
+    rect(x + 7, y - 2 - bounce, 2, 8, C.skin);
+    rect(x - 6, y - 17, 12, 11, C.skin);
+    rect(x - 8, y - 19, 16, 6, '#24202a');
+    rect(x - 7, y - 22, 14, 4, '#24202a');
+    rect(x - 4, y - 17, 3, 3, '#24202a'); rect(x + 1, y - 17, 3, 3, '#24202a');
+    rect(x - 5, y - 16, 5, 4, C.black); rect(x + 1, y - 16, 5, 4, C.black);
+    rect(x - 1, y - 15, 2, 2, '#24202a');
+    if (dir === 'down') { px(x - 2, y - 12, C.black); px(x + 2, y - 12, C.black); }
+    // 斜挎吉他
+    rect(x - 10, y - 2, 16, 4, '#8b5a3c');
+    rect(x - 9, y - 5, 10, 10, '#b4784f');
+    circle(x - 4, y, 3, '#5e3a2a');
+    rect(x + 4, y - 8, 3, 16, '#5e3a2a');
+  }
+
+  function drawGirl(x, y, dir, bounce) {
+    rect(x - 8, y + 13, 16, 3, 'rgba(0,0,0,0.28)');
+    rect(x - 5, y + 6 + bounce, 4, 7, '#f6d3dd');
+    rect(x + 1, y + 6 - bounce, 4, 7, '#f6d3dd');
+    rect(x - 7, y - 4, 14, 12, '#f5e6d0');
+    rect(x - 7, y - 3, 14, 3, '#e8d6bd');
+    rect(x - 7, y + 6, 14, 3, '#e8d6bd');
+    rect(x + 7, y - 2 - bounce, 2, 8, C.skin);
+    rect(x - 8, y - 19, 16, 6, '#2e2430');
+    rect(x - 6, y - 17, 12, 11, C.skin);
+    rect(x - 9, y - 16, 3, 16, '#2e2430');
+    rect(x + 6, y - 16, 3, 16, '#2e2430');
+    rect(x - 5, y - 17, 4, 5, '#2e2430'); rect(x + 2, y - 17, 4, 5, '#2e2430');
+    px(x - 3, y - 12, C.black); px(x + 3, y - 12, C.black);
+    rect(x - 2, y - 8, 4, 1, '#c96b80');
+    if (Math.floor(frame / 40) % 3 === 0) px(x + 9, y - 21, C.pink, 2);
+  }
+
+  function drawPlayers() {
+    const guyBounce = player.moving ? (Math.floor(player.step / 4) % 2) : 0;
+    const girlBounce = partner.moving ? (Math.floor(partner.step / 4) % 2) : 0;
+    const guyFirst = player.y <= partner.y;
+    const drawOne = (who, isGuy) => {
+      const x = Math.round(who.x), y = Math.round(who.y);
+      const bounce = isGuy ? guyBounce : girlBounce;
+      if (isGuy) drawGuy(x, y, who.dir, bounce);
+      else drawGirl(x, y, who.dir, bounce);
+    };
+    if (guyFirst) { drawOne(partner, false); drawOne(player, true); }
+    else { drawOne(player, true); drawOne(partner, false); }
   }
 
   function drawHighlight(zone) {
@@ -342,7 +379,7 @@ const PIXEL = (() => {
     else if (currentRoom === 'kitchen') drawKitchen();
     else if (currentRoom === 'bathroom') drawBathroom();
     drawHighlight(currentZone());
-    drawPlayer();
+    drawPlayers();
   }
 
   // ===== 卧室（对称墙面、床居中、衣物收纳靠墙）=====
@@ -550,6 +587,24 @@ const PIXEL = (() => {
       const nx = player.x + dx * speed, ny = player.y + dy * speed;
       if (!isSolid(nx, player.y)) player.x = nx;
       if (!isSolid(player.x, ny)) player.y = ny;
+      // 艺萌跟随：沿着崇新走过的路走，保持一点距离
+      if (dx || dy) {
+        partner.trail.push([player.x, player.y]);
+        if (partner.trail.length > 36) partner.trail.shift();
+      }
+      const target = partner.trail.length ? partner.trail[0] : [player.x - 24, player.y + 8];
+      const pdx = target[0] - partner.x, pdy = target[1] - partner.y;
+      const pdist = Math.hypot(pdx, pdy);
+      if (pdist > 3) {
+        const pspeed = Math.min(2.0, pdist);
+        const nx2 = partner.x + pdx / pdist * pspeed;
+        const ny2 = partner.y + pdy / pdist * pspeed;
+        if (!isSolid(nx2, partner.y)) partner.x = nx2;
+        if (!isSolid(partner.x, ny2)) partner.y = ny2;
+        partner.dir = Math.abs(pdx) > Math.abs(pdy) ? (pdx < 0 ? 'left' : 'right') : (pdy < 0 ? 'up' : 'down');
+        partner.moving = true; partner.step++;
+        if (pdist < 8 && partner.trail.length) partner.trail.shift();
+      } else partner.moving = false;
     } else player.moving = false;
   }
 
