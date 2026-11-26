@@ -53,7 +53,7 @@ window.addEventListener('room-change', (event) => {
   const names = { living: '客厅 · LIVING ROOM', bedroom: '卧室 · BEDROOM', kitchen: '厨房 · KITCHEN', bathroom: '卫生间 · BATHROOM' };
   $('#room-name').textContent = names[event.detail] || '小屋';
   const toast = $('#zone-toast');
-  $('#toast-text').textContent = `欢迎来到${names[event.detail].split(' · ')[0]} ♡`;
+    $('#toast-text').textContent = `欢迎来到${(names[event.detail] || '小屋 · HOME').split(' · ')[0]} ♡`;
   toast.classList.add('show');
   clearTimeout(window.roomToastTimer);
   window.roomToastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
@@ -63,7 +63,11 @@ const foundKey = 'pixel-house-found-v2';
 let found = new Set();
 try { found = new Set(JSON.parse(localStorage.getItem(foundKey) || '[]')); } catch {}
 function updateFoundCount() {
-  $('#found-count').textContent = `✦ 已发现 ${found.size} / ${Object.keys(zoneNames).length} 个彩蛋`;
+  if (window.Explore && typeof window.Explore.refreshBadge === 'function') {
+    window.Explore.refreshBadge();
+  } else {
+    $('#found-count').textContent = `✦ 已发现 ${found.size} / ${Object.keys(zoneNames).length} 个彩蛋`;
+  }
 }
 updateFoundCount();
 function markFound(id) {
