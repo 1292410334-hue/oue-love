@@ -561,3 +561,16 @@ body {
   .cal-day { min-height: 28px; font-size: 0.65rem; }
   .code-add { grid-template-columns: 1fr; }
 }
+
+/* ===== 隐藏收藏册 ===== */
+.collect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.collect-item {
+  display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 4px 8px;
+  padding: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+  text-align: left; opacity: 0.7;
+}
+.collect-item.got { border-color: var(--gold); background: rgba(255,209,102,0.08); opacity: 1; }
+.collect-icon { grid-row: span 2; font-size: 1.4rem; text-align: center; }
+.collect-item strong { font-size: 0.78rem; color: var(--text); }
+.collect-item small { font-size: 0.62rem; color: var(--muted); line-height: 1.4; }
+.collect-btn { border-color: rgba(167,139,250,0.7); }
