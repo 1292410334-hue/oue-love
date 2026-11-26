@@ -44,6 +44,9 @@ const PIXEL = (() => {
   const keys = {};
   const roomDoors = {};
   const zoneSets = {};
+  const extraZones = {};
+  const extraDraws = {};
+  const extraSolids = {};
 
   // ===== 房间定义 =====
   function defineRooms() {
@@ -67,7 +70,9 @@ const PIXEL = (() => {
       // 通往其他房间的门
       { id: 'door-bedroom', x: 348, y: 116, w: 48, h: 80, label: '卧室门', hint: '进入卧室', door: 'bedroom' },
       { id: 'door-kitchen', x: 676, y: 276, w: 36, h: 76, label: '厨房门', hint: '进入厨房', door: 'kitchen' },
-      { id: 'door-bathroom', x: 676, y: 76, w: 36, h: 76, label: '卫生间门', hint: '进入卫生间', door: 'bathroom' }
+      { id: 'door-bathroom', x: 676, y: 76, w: 36, h: 76, label: '卫生间门', hint: '进入卫生间', door: 'bathroom' },
+      { id: 'door-balcony', x: 40, y: 268, w: 44, h: 92, label: '阳台玻璃门', hint: '推开阳台门', door: 'balcony' },
+      { id: 'door-study', x: 676, y: 176, w: 36, h: 76, label: '书房门', hint: '进入书房', door: 'study' }
     ];
     zoneSets.bedroom = [
       { id: 'bed', x: 92, y: 130, w: 200, h: 130, label: '我们的床', hint: '躺一会儿吧' },
@@ -106,6 +111,7 @@ const PIXEL = (() => {
 
   const zones = () => {
     const list = (zoneSets[currentRoom] || []).slice();
+    (extraZones[currentRoom] || []).forEach(zone => list.push(zone));
     if (currentRoom === 'living') list.push({ id: 'dog', x: dog.x - 14, y: dog.y - 14, w: 28, h: 28, label: '小狗', hint: '摸摸小狗' });
     return list;
   };
@@ -115,10 +121,11 @@ const PIXEL = (() => {
   function currentZone() { return zones().find(zone => inside(zone, player.x, player.y + 12)) || null; }
 
   function setRoom(room) {
-    if (!zoneSets[room]) return;
+    if (!zoneSets[room] && !extraDraws[room] && !extraZones[room]) return;
     currentRoom = room;
     // 根据房间设置入场位置（在门口附近）
-    const entry = { living: [360, 380], bedroom: [620, 330], kitchen: [620, 350], bathroom: [620, 350] }[room];
+    const entry = { living: [360, 380], bedroom: [620, 330], kitchen: [620, 350], bathroom: [620, 350],
+      balcony: [360, 350], study: [360, 350], attic: [360, 350] }[room];
     player.x = entry[0]; player.y = entry[1];
     partner.x = entry[0] + 26; partner.y = entry[1] + 10; partner.trail = [];
     dog.x = entry[0] - 28; dog.y = entry[1] + 12; dog.trail = [];
@@ -483,6 +490,7 @@ const PIXEL = (() => {
     else if (currentRoom === 'bedroom') drawBedroom();
     else if (currentRoom === 'kitchen') drawKitchen();
     else if (currentRoom === 'bathroom') drawBathroom();
+    (extraDraws[currentRoom] || []).forEach(fn => fn());
     drawHighlight(currentZone());
     drawPlayers();
   }
@@ -672,7 +680,8 @@ const PIXEL = (() => {
 
   function isSolid(x, y) {
     if (x < 10 || x > W - 10 || y < 26 || y > H - 10) return true;
-    return (solidAreas[currentRoom] || []).some(([x1, y1, x2, y2]) => x > x1 && x < x2 && y > y1 && y < y2);
+    const areas = (solidAreas[currentRoom] || []).concat(extraSolids[currentRoom] || []);
+    return areas.some(([x1, y1, x2, y2]) => x > x1 && x < x2 && y > y1 && y < y2);
   }
 
   function update() {
@@ -749,6 +758,10 @@ const PIXEL = (() => {
     setKey: (code, value) => { keys[code] = value; },
     setRoom,
     getRoom: () => currentRoom,
+    registerZones: (room, list) => { extraZones[room] = (extraZones[room] || []).concat(list); },
+    registerDraw: (room, fn) => { extraDraws[room] = (extraDraws[room] || []).concat(fn); },
+    registerSolids: (room, areas) => { extraSolids[room] = (extraSolids[room] || []).concat(areas); },
+    draw: { rect, px, circle, colors: C, get frame() { return frame; } },
     W, H
   };
 })();
